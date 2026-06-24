@@ -22,35 +22,89 @@ import bedroomImage from "@/assets/category-bedroom.jpg";
 import diningImage from "@/assets/category-dining.jpg";
 import officeImage from "@/assets/category-office.jpg";
 import outdoorImage from "@/assets/category-outdoor.jpg";
+import sofasImage from "@/assets/category-sofas.jpg";
+import chairsImage from "@/assets/category-chairs.jpg";
+import tablesImage from "@/assets/category-tables.jpg";
+import storageImage from "@/assets/category-storage.jpg";
 import heroImage from "@/assets/hero-luxury-living.jpg";
 
-const categories = [
+type Category = {
+  title: string;
+  image: string;
+  copy: string;
+  eyebrow: string;
+  span: string;
+  height: string;
+  featured?: boolean;
+};
+
+const categories: Category[] = [
   {
-    title: "Living Room",
-    image: heroImage,
-    copy: "Cloud-soft seating, sculpted tables, and layered lighting for statement gathering spaces.",
+    title: "Sofas & Sectionals",
+    eyebrow: "Featured collection",
+    image: sofasImage,
+    copy: "Cloud-soft seating in Belgian linen and boucle, framed in solid walnut for statement living rooms.",
+    span: "lg:col-span-8 lg:row-span-2",
+    height: "h-[28rem] lg:h-[44rem]",
+    featured: true,
   },
   {
-    title: "Bedroom",
+    title: "Beds & Headboards",
+    eyebrow: "Bedroom",
     image: bedroomImage,
-    copy: "Tailored beds, tactile upholstery, and serene finishes designed for restorative luxury.",
+    copy: "Tailored canopy beds and channel-tufted headboards for restorative bedrooms.",
+    span: "lg:col-span-4",
+    height: "h-72 lg:h-[21rem]",
   },
   {
-    title: "Dining Room",
+    title: "Dining Tables",
+    eyebrow: "Dining",
     image: diningImage,
-    copy: "Architectural tables and curved dining chairs that make every setting feel ceremonial.",
+    copy: "Bookmatched walnut and sculpted bases that anchor every gathering.",
+    span: "lg:col-span-4",
+    height: "h-72 lg:h-[21rem]",
   },
   {
-    title: "Office",
+    title: "Accent Chairs",
+    eyebrow: "Seating",
+    image: chairsImage,
+    copy: "Sculptural silhouettes in shearling, leather, and steam-bent walnut.",
+    span: "lg:col-span-4",
+    height: "h-72 lg:h-80",
+  },
+  {
+    title: "Coffee & Side Tables",
+    eyebrow: "Living surfaces",
+    image: tablesImage,
+    copy: "Travertine, hand-rubbed walnut, and brushed brass — composed with quiet weight.",
+    span: "lg:col-span-4",
+    height: "h-72 lg:h-80",
+  },
+  {
+    title: "Storage & Display",
+    eyebrow: "Casegoods",
+    image: storageImage,
+    copy: "Glass-fronted vitrines and walnut credenzas with hand-cast bronze hardware.",
+    span: "lg:col-span-4",
+    height: "h-72 lg:h-80",
+  },
+  {
+    title: "Executive Office",
+    eyebrow: "Workspaces",
     image: officeImage,
-    copy: "Walnut desks and lounge-ready seating for beautifully productive workspaces.",
+    copy: "Walnut desks with leather inlay and lounge-ready seating for considered work.",
+    span: "lg:col-span-6",
+    height: "h-72 lg:h-96",
   },
   {
-    title: "Outdoor Furniture",
+    title: "Outdoor Living",
+    eyebrow: "Al fresco",
     image: outdoorImage,
-    copy: "Resort-inspired silhouettes made to soften terraces, courtyards, and poolside rooms.",
+    copy: "FSC teak and performance weaves designed for terraces, courtyards, and poolside.",
+    span: "lg:col-span-6",
+    height: "h-72 lg:h-96",
   },
-] as const;
+];
 
 const featuredProducts = [
   {
