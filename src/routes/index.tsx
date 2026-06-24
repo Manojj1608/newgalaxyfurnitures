@@ -317,36 +317,52 @@ function HomePage() {
       </section>
 
       <section id="categories" className="page-shell section-shell">
-        <div className="max-w-2xl space-y-5">
-          <p className="section-kicker">Shop by room</p>
-          <h2 className="section-title">Collections arranged like a beautifully edited home.</h2>
-          <p className="section-copy">
-            Each category is grounded in warm neutrals, natural texture, and a relaxed sense of
-            luxury drawn from the world&apos;s most elevated furniture houses.
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
+          <div className="max-w-2xl space-y-5">
+            <p className="section-kicker">Shop the collection</p>
+            <h2 className="section-title">A curated edit of premium furniture, by category.</h2>
+          </div>
+          <p className="section-copy lg:justify-self-end lg:text-right">
+            Eight signature collections — from sculptural sofas to executive walnut desks —
+            composed in an editorial grid drawn from the world&apos;s most elevated furniture houses.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-8 md:grid-cols-2 xl:grid-cols-5">
-          {categories.map((category, index) => (
+        <div className="mt-16 grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+          {categories.map((category) => (
             <article
               key={category.title}
-              className={`luxury-card image-frame group cursor-pointer transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)] ${index === 0 ? "md:col-span-2 xl:col-span-2" : ""}`}
+              className={`luxury-card image-frame group relative cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_44px_90px_-44px_color-mix(in_oklab,var(--color-foreground)_32%,transparent)] ${category.span}`}
             >
-              <div className="relative h-72 overflow-hidden xl:h-96">
+              <div className={`relative w-full overflow-hidden ${category.height}`}>
                 <img
                   src={category.image}
                   alt={category.title}
-                  className="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
+                  className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.07]"
                   loading="lazy"
-                  width={1536}
-                  height={1024}
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/55 via-black/10 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
-                <div className="absolute inset-x-0 bottom-0 p-6 text-primary-foreground transition-transform duration-500 group-hover:-translate-y-1">
-                  <p className="text-[11px] uppercase tracking-[0.3em] opacity-85">Collection</p>
-                  <h3 className="mt-2 font-display text-4xl">{category.title}</h3>
-                  <p className="mt-2 max-w-sm text-sm leading-7 opacity-90">{category.copy}</p>
-                  <span className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.28em] opacity-0 transition-all duration-500 group-hover:opacity-100">
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-black/80" />
+                <div className="absolute inset-x-0 bottom-0 p-6 text-primary-foreground transition-transform duration-500 group-hover:-translate-y-1 sm:p-8 lg:p-10">
+                  <p className="text-[10px] uppercase tracking-[0.34em] opacity-85 sm:text-[11px]">
+                    {category.eyebrow}
+                  </p>
+                  <h3
+                    className={`mt-3 font-display leading-none ${
+                      category.featured
+                        ? "text-4xl sm:text-5xl lg:text-6xl"
+                        : "text-3xl sm:text-[2.1rem]"
+                    }`}
+                  >
+                    {category.title}
+                  </h3>
+                  <p
+                    className={`mt-3 leading-7 opacity-90 ${
+                      category.featured ? "max-w-md text-sm sm:text-base" : "max-w-sm text-sm"
+                    }`}
+                  >
+                    {category.copy}
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] opacity-0 transition-all duration-500 group-hover:translate-x-1 group-hover:opacity-100">
                     Explore collection <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
@@ -355,6 +371,7 @@ function HomePage() {
           ))}
         </div>
       </section>
+
 
       <section id="featured" className="page-shell section-shell border-t border-border/60">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-end">
