@@ -293,10 +293,11 @@ function HomePage() {
             <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
               Inspired by the quiet confidence of luxury interiors
             </Badge>
-            <h1 className="mt-6 font-display text-5xl leading-[0.95] text-foreground sm:text-[3.6rem] lg:text-[5.2rem]">
+            <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
               Furniture curated for luminous, richly layered homes.
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">
+            <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground sm:text-base">
+
               Explore sculptural silhouettes, tactile upholstery, and warm walnut craftsmanship —
               hand-built in our atelier and styled by our in-house design concierge.
             </p>
