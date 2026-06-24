@@ -296,11 +296,11 @@ function HomePage() {
             <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
               Furniture curated for luminous, richly layered homes.
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground sm:text-base">
-
+            <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground">
               Explore sculptural silhouettes, tactile upholstery, and warm walnut craftsmanship —
               hand-built in our atelier and styled by our in-house design concierge.
             </p>
+
             <div className="mt-10 flex flex-wrap gap-3">
               <Button variant="luxury" size="lg" asChild>
                 <a href="#featured">
