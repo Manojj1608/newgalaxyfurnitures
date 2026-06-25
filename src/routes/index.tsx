@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
-  Award,
   Gem,
   Instagram,
   Linkedin,
@@ -12,6 +11,7 @@ import {
   Quote,
   ShieldCheck,
   Trees,
+  Truck,
   Youtube,
 } from "lucide-react";
 
@@ -151,53 +151,30 @@ const featuredProducts = [
   },
 ] as const;
 
-const inspirationGallery = [
-  {
-    title: "Soft geometry",
-    copy: "Curves, pale stone, and walnut grain composed with generous breathing room.",
-    image: heroImage,
-  },
-  {
-    title: "Quiet retreat",
-    copy: "Layered upholstery and dimmable light for a slower, more tactile bedroom mood.",
-    image: bedroomImage,
-  },
-  {
-    title: "Entertaining ritual",
-    copy: "Dining spaces with sculptural forms that anchor conversation and warm hospitality.",
-    image: diningImage,
-  },
-  {
-    title: "Open-air calm",
-    copy: "Outdoor compositions that feel grounded, sun-washed, and quietly elevated.",
-    image: outdoorImage,
-  },
-] as const;
-
 const trustMetrics = [
-  { value: "18", label: "Years crafting bespoke interiors" },
+  { value: "18", label: "Years crafting bespoke furniture" },
   { value: "2,400+", label: "Homes furnished across India" },
-  { value: "120", label: "Master artisans in our atelier" },
+  { value: "120", label: "Master artisans in our workshop" },
   { value: "10 yr", label: "Structural warranty on every piece" },
 ] as const;
 
 const successStories = [
   {
-    title: "A Bandra penthouse, reimagined in 9 weeks.",
+    title: "A Bandra penthouse furnished in 9 weeks.",
     summary:
-      "Our concierge team curated 38 walnut-and-linen pieces around a single mood board — delivered, installed, and styled on schedule.",
+      "38 walnut-and-linen pieces selected, manufactured, and white-glove installed on schedule — every order tracked end to end.",
     client: "Mehta Residence, Mumbai",
   },
   {
     title: "Outfitting a 14-villa coastal resort.",
     summary:
-      "From dining halls to private terraces, we delivered cohesive interiors using FSC-certified teak and weather-tested upholstery.",
+      "From dining halls to private terraces, we delivered cohesive furniture in FSC-certified teak and weather-tested upholstery, ahead of opening.",
     client: "Saira Hospitality Group, Goa",
   },
   {
     title: "A heritage bungalow restoration.",
     summary:
-      "Our artisans hand-restored original teak floors and built custom seating to complement century-old architecture.",
+      "Our workshop hand-built custom seating and casegoods to fit century-old architecture, with on-site finishing and a 10-year warranty.",
     client: "Rao Family Estate, Bengaluru",
   },
 ] as const;
@@ -237,13 +214,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Bespoke luxury furniture in walnut, beige, and off-white. Concierge design consultations, master craftsmanship, and editorial interiors for refined homes.",
+          "Premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery across India, and a 10-year structural warranty.",
       },
       { property: "og:title", content: "Avery & Co. | Premium Luxury Furniture" },
       {
         property: "og:description",
         content:
-          "A warm, editorial luxury furniture house — bespoke craftsmanship and concierge design consultations.",
+          "Shop sculptural sofas, walnut dining tables, beds, and casegoods — hand-built and delivered white-glove across India.",
       },
     ],
   }),
@@ -251,6 +228,9 @@ export const Route = createFileRoute("/")({
   errorComponent: HomeErrorComponent,
   notFoundComponent: HomeNotFoundComponent,
 });
+
+const WHATSAPP_URL =
+  "https://wa.me/919876543210?text=Hello%20Avery%20%26%20Co.,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
 
 function HomePage() {
   return (
@@ -265,11 +245,11 @@ function HomePage() {
               </p>
             </div>
             <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 md:flex">
-              <a href="#categories" className="story-link">Categories</a>
+              <a href="#categories" className="story-link">Collections</a>
+              <a href="#why" className="story-link">Why us</a>
               <a href="#featured" className="story-link">Featured</a>
-              <a href="#inspiration" className="story-link">Inspiration</a>
-              <a href="#consult" className="story-link">Consultations</a>
               <a href="#about" className="story-link">About</a>
+              <a href="#contact" className="story-link">Contact</a>
             </nav>
             <div className="justify-self-end">
               <CartDrawer />
@@ -291,14 +271,14 @@ function HomePage() {
         <div className="page-shell relative flex min-h-screen items-end pb-16 pt-32 sm:pb-24 lg:pb-32">
           <div className="hero-panel max-w-2xl animate-fade-in">
             <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-              Inspired by the quiet confidence of luxury interiors
+              A premium luxury furniture showroom
             </Badge>
             <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
               Furniture curated for luminous, richly layered homes.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground">
-              Explore sculptural silhouettes, tactile upholstery, and warm walnut craftsmanship —
-              hand-built in our atelier and styled by our in-house design concierge.
+              Sculptural silhouettes, tactile upholstery, and warm walnut craftsmanship — hand-built
+              in our workshop and delivered white-glove across India.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
@@ -309,7 +289,7 @@ function HomePage() {
                 </a>
               </Button>
               <Button variant="outlineWarm" size="lg" asChild>
-                <a href="#consult">Book a consultation</a>
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">Enquire on WhatsApp</a>
               </Button>
             </div>
           </div>
@@ -319,7 +299,7 @@ function HomePage() {
       <section id="categories" className="page-shell section-shell">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
           <div className="max-w-2xl space-y-5">
-            <p className="section-kicker">Shop the collection</p>
+            <p className="section-kicker">Featured collections</p>
             <h2 className="section-title">A curated edit of premium furniture, by category.</h2>
           </div>
           <p className="section-copy lg:justify-self-end lg:text-right">
@@ -372,143 +352,117 @@ function HomePage() {
         </div>
       </section>
 
-
-      <section id="featured" className="page-shell section-shell border-t border-border/60">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-end">
-          <div className="space-y-5">
-            <p className="section-kicker">Featured pieces</p>
-            <h2 className="section-title">Signature pieces from this season&apos;s atelier.</h2>
-          </div>
-          <p className="section-copy lg:justify-self-end lg:text-right">
-            A curated edit of hand-built furniture in walnut, linen, teak, and brass — each piece
-            sized for bespoke order and shipped white-glove across India.
-          </p>
+      <section id="why" className="page-shell section-shell border-t border-border/60">
+        <div className="max-w-2xl space-y-5">
+          <p className="section-kicker">Why choose us</p>
+          <h2 className="section-title">Built to last. Delivered with care.</h2>
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {featuredProducts.map((product) => (
-            <article
-              key={product.name}
-              className="luxury-card group flex h-full flex-col transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)]"
-            >
-              <div className="image-frame relative overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="h-80 w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
-                  loading="lazy"
-                />
-                <span className="absolute left-5 top-5 rounded-full bg-background/85 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
-                  {product.category}
-                </span>
-              </div>
-              <div className="flex flex-1 flex-col gap-5 p-7">
-                <div className="flex items-start justify-between gap-4">
-                  <h3 className="font-display text-3xl leading-tight text-foreground">{product.name}</h3>
-                  <p className="whitespace-nowrap text-sm font-medium text-wood">{product.price}</p>
-                </div>
-                <p className="text-sm leading-7 text-muted-foreground">{product.materials}</p>
-                <div className="mt-auto flex items-center justify-between border-t border-border/60 pt-5 text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                  <span>Made to order · 6–8 wks</span>
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="page-shell section-shell border-t border-border/60">
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
             <Gem className="h-5 w-5 text-accent-foreground" />
             <h3 className="mt-5 font-display text-3xl text-foreground">Material-led luxury</h3>
             <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              Walnut grain, boucle texture, soft linen, and brushed metal accents build quiet depth
-              into every composition.
+              Walnut grain, boucle texture, soft linen, and brushed metal — every material chosen
+              for tactile depth and longevity.
             </p>
           </div>
           <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
-            <ShieldCheck className="h-5 w-5 text-accent-foreground" />
-            <h3 className="mt-5 font-display text-3xl text-foreground">Concierge service</h3>
+            <Truck className="h-5 w-5 text-accent-foreground" />
+            <h3 className="mt-5 font-display text-3xl text-foreground">White-glove delivery</h3>
             <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              From mood board to white-glove installation, our design concierge guides every step
-              with the discretion of a private atelier.
+              Scheduled delivery, in-room placement, unpacking and assembly — handled by our
+              dedicated logistics team across India.
             </p>
           </div>
           <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
             <Trees className="h-5 w-5 text-accent-foreground" />
             <h3 className="mt-5 font-display text-3xl text-foreground">Responsibly sourced</h3>
             <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              FSC-certified hardwoods, natural fibers, and small-batch finishing keep each
+              FSC-certified hardwoods, natural fibres, and small-batch finishing keep each
               collection grounded in considered craft.
+            </p>
+          </div>
+          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
+            <ShieldCheck className="h-5 w-5 text-accent-foreground" />
+            <h3 className="mt-5 font-display text-3xl text-foreground">10-year warranty</h3>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">
+              Structural warranty on every frame, complimentary repairs in the first year, and
+              lifetime servicing from the artisans who built your piece.
             </p>
           </div>
         </div>
       </section>
 
-      <section id="inspiration" className="page-shell section-shell border-t border-border/60">
-        <div className="max-w-2xl space-y-5">
-          <p className="section-kicker">Room inspiration</p>
-          <h2 className="section-title">Editorial spaces for every mood of home.</h2>
-          <p className="section-copy">
-            Large-format imagery and calm pacing evoke the atmosphere of a premium catalog while
-            keeping the browsing experience airy and modern.
+      <section id="featured" className="page-shell section-shell border-t border-border/60">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-end">
+          <div className="space-y-5">
+            <p className="section-kicker">Featured products</p>
+            <h2 className="section-title">Signature pieces from this season&apos;s workshop.</h2>
+          </div>
+          <p className="section-copy lg:justify-self-end lg:text-right">
+            A curated edit of hand-built furniture in walnut, linen, teak, and brass — each piece
+            available to order and shipped white-glove across India.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <article className="luxury-card image-frame group cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-1.5">
-            <div className="overflow-hidden">
-              <img
-                src={inspirationGallery[0].image}
-                alt={inspirationGallery[0].title}
-                className="h-[28rem] w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
-                loading="lazy"
-                width={1536}
-                height={1024}
-              />
-            </div>
-            <div className="space-y-3 p-7">
-              <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Signature mood</p>
-              <h3 className="font-display text-4xl text-foreground">{inspirationGallery[0].title}</h3>
-              <p className="text-sm leading-7 text-muted-foreground">{inspirationGallery[0].copy}</p>
-            </div>
-          </article>
-
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1">
-            {inspirationGallery.slice(1).map((item) => (
+        <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+          {featuredProducts.map((product) => {
+            const enquireUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
+              `Hello Avery & Co., I'd like product details and a quote for the ${product.name}.`,
+            )}`;
+            return (
               <article
-                key={item.title}
-                className="luxury-card image-frame group cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-1.5"
+                key={product.name}
+                className="luxury-card group flex h-full flex-col transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)]"
               >
-                <div className="overflow-hidden">
+                <div className="image-frame relative overflow-hidden">
                   <img
-                    src={item.image}
-                    alt={item.title}
-                    className="h-64 w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
+                    src={product.image}
+                    alt={product.name}
+                    className="h-80 w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
                     loading="lazy"
-                    width={1536}
-                    height={1024}
                   />
+                  <span className="absolute left-5 top-5 rounded-full bg-background/85 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
+                    {product.category}
+                  </span>
                 </div>
-                <div className="space-y-2 p-6">
-                  <h3 className="font-display text-3xl text-foreground">{item.title}</h3>
-                  <p className="text-sm leading-7 text-muted-foreground">{item.copy}</p>
+                <div className="flex flex-1 flex-col gap-5 p-7">
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="font-display text-3xl leading-tight text-foreground">{product.name}</h3>
+                    <p className="whitespace-nowrap text-sm font-medium text-wood">{product.price}</p>
+                  </div>
+                  <p className="text-sm leading-7 text-muted-foreground">{product.materials}</p>
+                  <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+                    Made to order · 6–8 wks · White-glove delivery
+                  </p>
+                  <div className="mt-auto flex flex-wrap gap-3 border-t border-border/60 pt-5">
+                    <Button variant="wood" asChild>
+                      <a href={enquireUrl} target="_blank" rel="noreferrer">
+                        Enquire on WhatsApp
+                      </a>
+                    </Button>
+                    <Button variant="outlineWarm" asChild>
+                      <a href="#contact">
+                        Get product details
+                        <ArrowRight />
+                      </a>
+                    </Button>
+                  </div>
                 </div>
               </article>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
 
-      <section className="page-shell section-shell border-t border-border/60">
+      <section id="trust" className="page-shell section-shell border-t border-border/60">
         <div className="max-w-2xl space-y-5">
-          <p className="section-kicker">Trusted by discerning homes</p>
-          <h2 className="section-title">Eighteen years of considered craft.</h2>
+          <p className="section-kicker">Customer testimonials</p>
+          <h2 className="section-title">Loved by homeowners across India.</h2>
           <p className="section-copy">
-            A small set of numbers that hint at the scale and care behind every Avery &amp; Co.
-            commission.
+            Eighteen years of furniture commissions — measured in the homes, resorts, and heritage
+            estates that trust us to deliver.
           </p>
         </div>
 
@@ -541,66 +495,6 @@ function HomePage() {
         </div>
       </section>
 
-      <section id="consult" className="page-shell section-shell border-t border-border/60">
-        <div className="luxury-card relative overflow-hidden">
-          <img
-            src={diningImage}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover opacity-25"
-          />
-          <div className="absolute inset-0 bg-linear-to-r from-background/95 via-background/85 to-background/60" />
-          <div className="relative grid gap-10 p-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-center lg:p-16">
-            <div className="space-y-6">
-              <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-                Complimentary design concierge
-              </Badge>
-              <h2 className="font-display text-4xl leading-[1.05] text-foreground sm:text-5xl lg:text-6xl">
-                Book a private furniture consultation with our design atelier.
-              </h2>
-              <p className="max-w-xl text-base leading-8 text-muted-foreground">
-                Share your floor plan, palette, and lifestyle — we&apos;ll respond within 24 hours
-                with a curated piece selection, material samples, and a tailored quote.
-              </p>
-              <ul className="grid gap-3 text-sm leading-7 text-muted-foreground sm:grid-cols-2">
-                <li className="flex items-start gap-3"><Award className="mt-1 h-4 w-4 text-wood" /> 1:1 session with a senior designer</li>
-                <li className="flex items-start gap-3"><Award className="mt-1 h-4 w-4 text-wood" /> Material &amp; finish samples to your home</li>
-                <li className="flex items-start gap-3"><Award className="mt-1 h-4 w-4 text-wood" /> Bespoke quote within 24 hours</li>
-                <li className="flex items-start gap-3"><Award className="mt-1 h-4 w-4 text-wood" /> White-glove delivery &amp; styling</li>
-              </ul>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <Button variant="wood" size="lg" asChild>
-                  <a href="https://wa.me/919876543210?text=Hello%20Avery%20%26%20Co.,%20I%27d%20like%20to%20book%20a%20design%20consultation." target="_blank" rel="noreferrer">
-                    Book consultation
-                    <ArrowRight />
-                  </a>
-                </Button>
-                <Button variant="outlineWarm" size="lg" asChild>
-                  <a href="mailto:atelier@averyandco.in">Email the atelier</a>
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-4 rounded-[calc(var(--radius-2xl))] border border-border/70 bg-background/80 p-7 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Direct lines</p>
-              <div className="space-y-4 text-sm">
-                <a href="tel:+919876543210" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
-                  <Phone className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">+91 98765 43210</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
-                </a>
-                <a href="mailto:atelier@averyandco.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
-                  <Mail className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">atelier@averyandco.in</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
-                </a>
-                <div className="flex items-start gap-3 text-foreground">
-                  <MapPin className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">Mumbai showroom</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">By appointment</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section id="about" className="page-shell section-shell border-t border-border/60">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
           <div className="luxury-card image-frame overflow-hidden">
@@ -625,14 +519,75 @@ function HomePage() {
               <div className="luxury-card p-6">
                 <p className="font-display text-4xl text-wood">01</p>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  An in-house atelier of 120 master artisans, each piece signed by its maker.
+                  An in-house workshop of 120 master artisans — every piece signed by its maker.
                 </p>
               </div>
               <div className="luxury-card p-6">
                 <p className="font-display text-4xl text-wood">02</p>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  Bespoke commissions tailored to your floor plan, palette, and lifestyle.
+                  Bespoke sizing, fabric, and finish options on every made-to-order piece.
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="page-shell section-shell border-t border-border/60">
+        <div className="luxury-card relative overflow-hidden">
+          <img
+            src={diningImage}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover opacity-25"
+          />
+          <div className="absolute inset-0 bg-linear-to-r from-background/95 via-background/85 to-background/60" />
+          <div className="relative grid gap-10 p-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-center lg:p-16">
+            <div className="space-y-6">
+              <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
+                Contact &amp; enquiries
+              </Badge>
+              <h2 className="font-display text-4xl leading-[1.05] text-foreground sm:text-5xl lg:text-6xl">
+                Enquire about any piece — we&apos;ll respond within 24 hours.
+              </h2>
+              <p className="max-w-xl text-base leading-8 text-muted-foreground">
+                Share the piece, the room, and your delivery city. Our team will confirm pricing,
+                availability, lead times, and white-glove logistics — all backed by our 10-year
+                structural warranty.
+              </p>
+              <ul className="grid gap-3 text-sm leading-7 text-muted-foreground sm:grid-cols-2">
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Request a quote in writing</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Check availability &amp; lead times</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Material &amp; finish details on request</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> White-glove delivery &amp; warranty</li>
+              </ul>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button variant="wood" size="lg" asChild>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+                    Enquire on WhatsApp
+                    <ArrowRight />
+                  </a>
+                </Button>
+                <Button variant="outlineWarm" size="lg" asChild>
+                  <a href="mailto:sales@averyandco.in?subject=Quote%20request">Request a quote</a>
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-4 rounded-[calc(var(--radius-2xl))] border border-border/70 bg-background/80 p-7 backdrop-blur">
+              <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Direct lines</p>
+              <div className="space-y-4 text-sm">
+                <a href="tel:+919876543210" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                  <Phone className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-2xl">+91 98765 43210</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
+                </a>
+                <a href="mailto:sales@averyandco.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                  <Mail className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-2xl">sales@averyandco.in</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
+                </a>
+                <div className="flex items-start gap-3 text-foreground">
+                  <MapPin className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-2xl">Mumbai showroom</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Visit our showroom · Mon–Sat</span></span>
+                </div>
               </div>
             </div>
           </div>
@@ -644,8 +599,8 @@ function HomePage() {
           <div className="space-y-5">
             <p className="font-display text-4xl text-foreground">Avery &amp; Co.</p>
             <p className="max-w-md text-sm leading-7 text-muted-foreground">
-              A modern luxury furniture house. Bespoke craftsmanship, concierge design, and an
-              editorial sensibility for refined homes across India and beyond.
+              A modern luxury furniture house. Bespoke craftsmanship, white-glove delivery, and a
+              10-year structural warranty on every piece — for refined homes across India and beyond.
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/60 text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-wood hover:text-wood-foreground">
@@ -663,11 +618,11 @@ function HomePage() {
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Browse</p>
             <div className="mt-5 space-y-3 text-sm text-foreground">
-              <a href="#categories" className="block story-link">Categories</a>
-              <a href="#featured" className="block story-link">Featured pieces</a>
-              <a href="#inspiration" className="block story-link">Inspiration</a>
-              <a href="#consult" className="block story-link">Consultations</a>
+              <a href="#categories" className="block story-link">Collections</a>
+              <a href="#featured" className="block story-link">Featured products</a>
+              <a href="#why" className="block story-link">Why choose us</a>
               <a href="#about" className="block story-link">About</a>
+              <a href="#contact" className="block story-link">Contact</a>
             </div>
           </div>
 
@@ -675,8 +630,8 @@ function HomePage() {
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Contact</p>
             <div className="mt-5 space-y-3 text-sm text-foreground">
               <a href="tel:+919876543210" className="flex items-center gap-2 story-link"><Phone className="h-3.5 w-3.5" />+91 98765 43210</a>
-              <a href="mailto:atelier@averyandco.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />atelier@averyandco.in</a>
-              <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" className="flex items-center gap-2 story-link"><MessageCircle className="h-3.5 w-3.5" />WhatsApp concierge</a>
+              <a href="mailto:sales@averyandco.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />sales@averyandco.in</a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 story-link"><MessageCircle className="h-3.5 w-3.5" />WhatsApp enquiries</a>
             </div>
           </div>
 
@@ -689,7 +644,7 @@ function HomePage() {
               </div>
               <div>
                 <p className="font-display text-xl">Bengaluru</p>
-                <p className="mt-1 text-muted-foreground">42 Lavelle Road<br />By appointment</p>
+                <p className="mt-1 text-muted-foreground">42 Lavelle Road<br />Mon–Sat · 11am–8pm</p>
               </div>
             </div>
           </div>
@@ -703,10 +658,10 @@ function HomePage() {
       </footer>
 
       <a
-        href="https://wa.me/919876543210?text=Hello%20Avery%20%26%20Co.,%20I%27m%20interested%20in%20your%20luxury%20furniture%20collection."
+        href={WHATSAPP_URL}
         target="_blank"
         rel="noreferrer"
-        aria-label="Contact on WhatsApp"
+        aria-label="Enquire on WhatsApp"
         className="fixed bottom-5 right-5 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full bg-wood text-wood-foreground shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105"
       >
         <MessageCircle className="h-6 w-6" />
