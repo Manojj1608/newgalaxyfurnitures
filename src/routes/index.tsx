@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -9,6 +10,7 @@ import {
   MessageCircle,
   Phone,
   Quote,
+  Search,
   ShieldCheck,
   Trees,
   Truck,
@@ -18,6 +20,7 @@ import {
 import { CartDrawer } from "@/components/cart-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import bedroomImage from "@/assets/category-bedroom.jpg";
 import diningImage from "@/assets/category-dining.jpg";
 import officeImage from "@/assets/category-office.jpg";
@@ -41,7 +44,7 @@ type Category = {
 const categories: Category[] = [
   {
     title: "Sofas & Sectionals",
-    eyebrow: "Featured collection",
+    eyebrow: "Living Room",
     image: sofasImage,
     copy: "Cloud-soft seating in Belgian linen and boucle, framed in solid walnut for statement living rooms.",
     span: "lg:col-span-8 lg:row-span-2",
@@ -66,7 +69,7 @@ const categories: Category[] = [
   },
   {
     title: "Accent Chairs",
-    eyebrow: "Seating",
+    eyebrow: "Living Room",
     image: chairsImage,
     copy: "Sculptural silhouettes in shearling, leather, and steam-bent walnut.",
     span: "lg:col-span-4",
@@ -74,7 +77,7 @@ const categories: Category[] = [
   },
   {
     title: "Coffee & Side Tables",
-    eyebrow: "Living surfaces",
+    eyebrow: "Living Room",
     image: tablesImage,
     copy: "Travertine, hand-rubbed walnut, and brushed brass — composed with quiet weight.",
     span: "lg:col-span-4",
@@ -82,7 +85,7 @@ const categories: Category[] = [
   },
   {
     title: "Storage & Display",
-    eyebrow: "Casegoods",
+    eyebrow: "Storage",
     image: storageImage,
     copy: "Glass-fronted vitrines and walnut credenzas with hand-cast bronze hardware.",
     span: "lg:col-span-4",
@@ -90,7 +93,7 @@ const categories: Category[] = [
   },
   {
     title: "Executive Office",
-    eyebrow: "Workspaces",
+    eyebrow: "Office",
     image: officeImage,
     copy: "Walnut desks with leather inlay and lounge-ready seating for considered work.",
     span: "lg:col-span-6",
@@ -98,58 +101,13 @@ const categories: Category[] = [
   },
   {
     title: "Outdoor Living",
-    eyebrow: "Al fresco",
+    eyebrow: "Outdoor",
     image: outdoorImage,
     copy: "FSC teak and performance weaves designed for terraces, courtyards, and poolside.",
     span: "lg:col-span-6",
     height: "h-72 lg:h-96",
   },
 ];
-
-const featuredProducts = [
-  {
-    name: "Halden Lounge Sofa",
-    category: "Living Room",
-    price: "₹ 4,85,000",
-    materials: "Belgian linen · solid walnut frame · down-wrapped cushions",
-    image: heroImage,
-  },
-  {
-    name: "Marlow Canopy Bed",
-    category: "Bedroom",
-    price: "₹ 3,62,000",
-    materials: "Hand-rubbed walnut · brushed brass joinery · boucle headboard",
-    image: bedroomImage,
-  },
-  {
-    name: "Cassia Dining Table",
-    category: "Dining Room",
-    price: "₹ 2,98,000",
-    materials: "Bookmatched walnut top · sculpted oak base · matte oil finish",
-    image: diningImage,
-  },
-  {
-    name: "Atelier Walnut Desk",
-    category: "Office",
-    price: "₹ 1,84,000",
-    materials: "Solid walnut · leather inlay · hand-cast bronze pulls",
-    image: officeImage,
-  },
-  {
-    name: "Sereno Outdoor Lounge",
-    category: "Outdoor",
-    price: "₹ 2,45,000",
-    materials: "FSC teak · marine-grade rope · Sunbrella performance fabric",
-    image: outdoorImage,
-  },
-  {
-    name: "Vela Sculptural Armchair",
-    category: "Living Room",
-    price: "₹ 1,68,000",
-    materials: "Italian shearling · steam-bent ash · hand-stitched seams",
-    image: heroImage,
-  },
-] as const;
 
 const trustMetrics = [
   { value: "18", label: "Years crafting bespoke furniture" },
@@ -160,10 +118,10 @@ const trustMetrics = [
 
 const successStories = [
   {
-    title: "A Bandra penthouse furnished in 9 weeks.",
+    title: "A Bengaluru penthouse furnished in 9 weeks.",
     summary:
       "38 walnut-and-linen pieces selected, manufactured, and white-glove installed on schedule — every order tracked end to end.",
-    client: "Mehta Residence, Mumbai",
+    client: "Mehta Residence, Bengaluru",
   },
   {
     title: "Outfitting a 14-villa coastal resort.",
@@ -178,6 +136,11 @@ const successStories = [
     client: "Rao Family Estate, Bengaluru",
   },
 ] as const;
+
+const PHONE_DISPLAY = "+91 95134 43606";
+const PHONE_TEL = "+919513443606";
+const WHATSAPP_URL =
+  "https://wa.me/919513443606?text=Hello%20Avery%20%26%20Co.,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
 
 function HomeErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
@@ -229,10 +192,28 @@ export const Route = createFileRoute("/")({
   notFoundComponent: HomeNotFoundComponent,
 });
 
-const WHATSAPP_URL =
-  "https://wa.me/919876543210?text=Hello%20Avery%20%26%20Co.,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
-
 function HomePage() {
+  const [query, setQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+
+  const filters = useMemo(() => {
+    const set = new Set(categories.map((c) => c.eyebrow));
+    return ["All", ...Array.from(set)];
+  }, []);
+
+  const filteredCategories = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return categories.filter((c) => {
+      const matchesFilter = activeFilter === "All" || c.eyebrow === activeFilter;
+      const matchesQuery =
+        !q ||
+        c.title.toLowerCase().includes(q) ||
+        c.copy.toLowerCase().includes(q) ||
+        c.eyebrow.toLowerCase().includes(q);
+      return matchesFilter && matchesQuery;
+    });
+  }, [query, activeFilter]);
+
   return (
     <main className="relative overflow-hidden">
       <header className="absolute inset-x-0 top-0 z-20">
@@ -245,11 +226,10 @@ function HomePage() {
               </p>
             </div>
             <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 md:flex">
-              <a href="#categories" className="story-link">Collections</a>
-              <a href="#why" className="story-link">Why us</a>
-              <a href="#featured" className="story-link">Featured</a>
               <a href="#about" className="story-link">About</a>
+              <a href="#categories" className="story-link">Collections</a>
               <a href="#contact" className="story-link">Contact</a>
+              <a href="#why" className="story-link">Why us</a>
             </nav>
             <div className="justify-self-end">
               <CartDrawer />
@@ -283,8 +263,8 @@ function HomePage() {
 
             <div className="mt-10 flex flex-wrap gap-3">
               <Button variant="luxury" size="lg" asChild>
-                <a href="#featured">
-                  Explore featured pieces
+                <a href="#categories">
+                  Browse collections
                   <ArrowRight />
                 </a>
               </Button>
@@ -296,206 +276,8 @@ function HomePage() {
         </div>
       </section>
 
-      <section id="categories" className="page-shell section-shell">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
-          <div className="max-w-2xl space-y-5">
-            <p className="section-kicker">Featured collections</p>
-            <h2 className="section-title">A curated edit of premium furniture, by category.</h2>
-          </div>
-          <p className="section-copy lg:justify-self-end lg:text-right">
-            Eight signature collections — from sculptural sofas to executive walnut desks —
-            composed in an editorial grid drawn from the world&apos;s most elevated furniture houses.
-          </p>
-        </div>
-
-        <div className="mt-16 grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-          {categories.map((category) => (
-            <article
-              key={category.title}
-              className={`luxury-card image-frame group relative cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_44px_90px_-44px_color-mix(in_oklab,var(--color-foreground)_32%,transparent)] ${category.span}`}
-            >
-              <div className={`relative w-full overflow-hidden ${category.height}`}>
-                <img
-                  src={category.image}
-                  alt={category.title}
-                  className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.07]"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-black/80" />
-                <div className="absolute inset-x-0 bottom-0 p-6 text-primary-foreground transition-transform duration-500 group-hover:-translate-y-1 sm:p-8 lg:p-10">
-                  <p className="text-[10px] uppercase tracking-[0.34em] opacity-85 sm:text-[11px]">
-                    {category.eyebrow}
-                  </p>
-                  <h3
-                    className={`mt-3 font-display leading-none ${
-                      category.featured
-                        ? "text-4xl sm:text-5xl lg:text-6xl"
-                        : "text-3xl sm:text-[2.1rem]"
-                    }`}
-                  >
-                    {category.title}
-                  </h3>
-                  <p
-                    className={`mt-3 leading-7 opacity-90 ${
-                      category.featured ? "max-w-md text-sm sm:text-base" : "max-w-sm text-sm"
-                    }`}
-                  >
-                    {category.copy}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] opacity-0 transition-all duration-500 group-hover:translate-x-1 group-hover:opacity-100">
-                    Explore collection <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="why" className="page-shell section-shell border-t border-border/60">
-        <div className="max-w-2xl space-y-5">
-          <p className="section-kicker">Why choose us</p>
-          <h2 className="section-title">Built to last. Delivered with care.</h2>
-        </div>
-
-        <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
-            <Gem className="h-5 w-5 text-accent-foreground" />
-            <h3 className="mt-5 font-display text-3xl text-foreground">Material-led luxury</h3>
-            <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              Walnut grain, boucle texture, soft linen, and brushed metal — every material chosen
-              for tactile depth and longevity.
-            </p>
-          </div>
-          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
-            <Truck className="h-5 w-5 text-accent-foreground" />
-            <h3 className="mt-5 font-display text-3xl text-foreground">White-glove delivery</h3>
-            <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              Scheduled delivery, in-room placement, unpacking and assembly — handled by our
-              dedicated logistics team across India.
-            </p>
-          </div>
-          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
-            <Trees className="h-5 w-5 text-accent-foreground" />
-            <h3 className="mt-5 font-display text-3xl text-foreground">Responsibly sourced</h3>
-            <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              FSC-certified hardwoods, natural fibres, and small-batch finishing keep each
-              collection grounded in considered craft.
-            </p>
-          </div>
-          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
-            <ShieldCheck className="h-5 w-5 text-accent-foreground" />
-            <h3 className="mt-5 font-display text-3xl text-foreground">10-year warranty</h3>
-            <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              Structural warranty on every frame, complimentary repairs in the first year, and
-              lifetime servicing from the artisans who built your piece.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="featured" className="page-shell section-shell border-t border-border/60">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-end">
-          <div className="space-y-5">
-            <p className="section-kicker">Featured products</p>
-            <h2 className="section-title">Signature pieces from this season&apos;s workshop.</h2>
-          </div>
-          <p className="section-copy lg:justify-self-end lg:text-right">
-            A curated edit of hand-built furniture in walnut, linen, teak, and brass — each piece
-            available to order and shipped white-glove across India.
-          </p>
-        </div>
-
-        <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {featuredProducts.map((product) => {
-            const enquireUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
-              `Hello Avery & Co., I'd like product details and a quote for the ${product.name}.`,
-            )}`;
-            return (
-              <article
-                key={product.name}
-                className="luxury-card group flex h-full flex-col transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)]"
-              >
-                <div className="image-frame relative overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-80 w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  <span className="absolute left-5 top-5 rounded-full bg-background/85 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground backdrop-blur">
-                    {product.category}
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col gap-5 p-7">
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="font-display text-3xl leading-tight text-foreground">{product.name}</h3>
-                    <p className="whitespace-nowrap text-sm font-medium text-wood">{product.price}</p>
-                  </div>
-                  <p className="text-sm leading-7 text-muted-foreground">{product.materials}</p>
-                  <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                    Made to order · 6–8 wks · White-glove delivery
-                  </p>
-                  <div className="mt-auto flex flex-wrap gap-3 border-t border-border/60 pt-5">
-                    <Button variant="wood" asChild>
-                      <a href={enquireUrl} target="_blank" rel="noreferrer">
-                        Enquire on WhatsApp
-                      </a>
-                    </Button>
-                    <Button variant="outlineWarm" asChild>
-                      <a href="#contact">
-                        Get product details
-                        <ArrowRight />
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section id="trust" className="page-shell section-shell border-t border-border/60">
-        <div className="max-w-2xl space-y-5">
-          <p className="section-kicker">Customer testimonials</p>
-          <h2 className="section-title">Loved by homeowners across India.</h2>
-          <p className="section-copy">
-            Eighteen years of furniture commissions — measured in the homes, resorts, and heritage
-            estates that trust us to deliver.
-          </p>
-        </div>
-
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {trustMetrics.map((metric) => (
-            <div
-              key={metric.label}
-              className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1"
-            >
-              <p className="font-display text-6xl text-wood">{metric.value}</p>
-              <p className="mt-4 text-sm leading-7 text-muted-foreground">{metric.label}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {successStories.map((story) => (
-            <article
-              key={story.client}
-              className="luxury-card flex h-full flex-col gap-5 p-8 transition-all duration-500 hover:-translate-y-1"
-            >
-              <Quote className="h-6 w-6 text-wood" />
-              <h3 className="font-display text-3xl leading-tight text-foreground">{story.title}</h3>
-              <p className="text-sm leading-7 text-muted-foreground">{story.summary}</p>
-              <p className="mt-auto border-t border-border/60 pt-5 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                {story.client}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="about" className="page-shell section-shell border-t border-border/60">
+      {/* About */}
+      <section id="about" className="page-shell section-shell">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
           <div className="luxury-card image-frame overflow-hidden">
             <img
@@ -533,6 +315,125 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Collections */}
+      <section id="categories" className="page-shell section-shell border-t border-border/60">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
+          <div className="max-w-2xl space-y-5">
+            <p className="section-kicker">Collections</p>
+            <h2 className="section-title">A curated edit of premium furniture, by category.</h2>
+          </div>
+          <p className="section-copy lg:justify-self-end lg:text-right">
+            Search by name, room, or material — or filter by category to find the pieces that
+            belong in your home.
+          </p>
+        </div>
+
+        {/* Search + filters */}
+        <div className="mt-10 space-y-5">
+          <div className="relative max-w-xl">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search sofas, walnut tables, outdoor pieces..."
+              aria-label="Search furniture collections"
+              className="h-12 rounded-full border-border/70 bg-background/70 pl-11 pr-4 text-sm backdrop-blur"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {filters.map((f) => {
+              const active = activeFilter === f;
+              return (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setActiveFilter(f)}
+                  className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.24em] transition-all duration-300 ${
+                    active
+                      ? "border-wood bg-wood text-wood-foreground shadow-sm"
+                      : "border-border/70 bg-background/60 text-muted-foreground hover:-translate-y-0.5 hover:border-wood/60 hover:text-foreground"
+                  }`}
+                  aria-pressed={active}
+                >
+                  {f}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {filteredCategories.length === 0 ? (
+          <div className="luxury-card mt-12 p-10 text-center">
+            <p className="font-display text-3xl text-foreground">No collections match your search.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Try a different keyword, clear the filters, or message us on WhatsApp for a curated
+              recommendation.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button
+                variant="outlineWarm"
+                onClick={() => {
+                  setQuery("");
+                  setActiveFilter("All");
+                }}
+              >
+                Reset filters
+              </Button>
+              <Button variant="wood" asChild>
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">
+                  Enquire on WhatsApp
+                </a>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-12 grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+            {filteredCategories.map((category) => (
+              <article
+                key={category.title}
+                className={`luxury-card image-frame group relative cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_44px_90px_-44px_color-mix(in_oklab,var(--color-foreground)_32%,transparent)] ${category.span}`}
+              >
+                <div className={`relative w-full overflow-hidden ${category.height}`}>
+                  <img
+                    src={category.image}
+                    alt={category.title}
+                    className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.07]"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-black/80" />
+                  <div className="absolute inset-x-0 bottom-0 p-6 text-primary-foreground transition-transform duration-500 group-hover:-translate-y-1 sm:p-8 lg:p-10">
+                    <p className="text-[10px] uppercase tracking-[0.34em] opacity-85 sm:text-[11px]">
+                      {category.eyebrow}
+                    </p>
+                    <h3
+                      className={`mt-3 font-display leading-none ${
+                        category.featured
+                          ? "text-4xl sm:text-5xl lg:text-6xl"
+                          : "text-3xl sm:text-[2.1rem]"
+                      }`}
+                    >
+                      {category.title}
+                    </h3>
+                    <p
+                      className={`mt-3 leading-7 opacity-90 ${
+                        category.featured ? "max-w-md text-sm sm:text-base" : "max-w-sm text-sm"
+                      }`}
+                    >
+                      {category.copy}
+                    </p>
+                    <span className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] opacity-0 transition-all duration-500 group-hover:translate-x-1 group-hover:opacity-100">
+                      Explore collection <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Contact */}
       <section id="contact" className="page-shell section-shell border-t border-border/60">
         <div className="luxury-card relative overflow-hidden">
           <img
@@ -576,9 +477,9 @@ function HomePage() {
             <div className="space-y-4 rounded-[calc(var(--radius-2xl))] border border-border/70 bg-background/80 p-7 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Direct lines</p>
               <div className="space-y-4 text-sm">
-                <a href="tel:+919876543210" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                <a href={`tel:${PHONE_TEL}`} className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Phone className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">+91 98765 43210</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
+                  <span><span className="block font-display text-2xl">{PHONE_DISPLAY}</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
                 </a>
                 <a href="mailto:sales@averyandco.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Mail className="mt-0.5 h-4 w-4 text-wood" />
@@ -586,11 +487,94 @@ function HomePage() {
                 </a>
                 <div className="flex items-start gap-3 text-foreground">
                   <MapPin className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">Mumbai showroom</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Visit our showroom · Mon–Sat</span></span>
+                  <span><span className="block font-display text-2xl">Bengaluru showroom</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">42 Lavelle Road · Mon–Sat · 11am–8pm</span></span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Why us */}
+      <section id="why" className="page-shell section-shell border-t border-border/60">
+        <div className="max-w-2xl space-y-5">
+          <p className="section-kicker">Why choose us</p>
+          <h2 className="section-title">Built to last. Delivered with care.</h2>
+        </div>
+
+        <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
+            <Gem className="h-5 w-5 text-accent-foreground" />
+            <h3 className="mt-5 font-display text-3xl text-foreground">Material-led luxury</h3>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">
+              Walnut grain, boucle texture, soft linen, and brushed metal — every material chosen
+              for tactile depth and longevity.
+            </p>
+          </div>
+          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
+            <Truck className="h-5 w-5 text-accent-foreground" />
+            <h3 className="mt-5 font-display text-3xl text-foreground">White-glove delivery</h3>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">
+              Scheduled delivery, in-room placement, unpacking and assembly — handled by our
+              dedicated logistics team across India.
+            </p>
+          </div>
+          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
+            <Trees className="h-5 w-5 text-accent-foreground" />
+            <h3 className="mt-5 font-display text-3xl text-foreground">Responsibly sourced</h3>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">
+              FSC-certified hardwoods, natural fibres, and small-batch finishing keep each
+              collection grounded in considered craft.
+            </p>
+          </div>
+          <div className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1">
+            <ShieldCheck className="h-5 w-5 text-accent-foreground" />
+            <h3 className="mt-5 font-display text-3xl text-foreground">10-year warranty</h3>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">
+              Structural warranty on every frame, complimentary repairs in the first year, and
+              lifetime servicing from the artisans who built your piece.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="trust" className="page-shell section-shell border-t border-border/60">
+        <div className="max-w-2xl space-y-5">
+          <p className="section-kicker">Customer testimonials</p>
+          <h2 className="section-title">Loved by homeowners across India.</h2>
+          <p className="section-copy">
+            Eighteen years of furniture commissions — measured in the homes, resorts, and heritage
+            estates that trust us to deliver.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {trustMetrics.map((metric) => (
+            <div
+              key={metric.label}
+              className="luxury-card p-8 transition-all duration-500 hover:-translate-y-1"
+            >
+              <p className="font-display text-6xl text-wood">{metric.value}</p>
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">{metric.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+          {successStories.map((story) => (
+            <article
+              key={story.client}
+              className="luxury-card flex h-full flex-col gap-5 p-8 transition-all duration-500 hover:-translate-y-1"
+            >
+              <Quote className="h-6 w-6 text-wood" />
+              <h3 className="font-display text-3xl leading-tight text-foreground">{story.title}</h3>
+              <p className="text-sm leading-7 text-muted-foreground">{story.summary}</p>
+              <p className="mt-auto border-t border-border/60 pt-5 text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                {story.client}
+              </p>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -618,33 +602,28 @@ function HomePage() {
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Browse</p>
             <div className="mt-5 space-y-3 text-sm text-foreground">
-              <a href="#categories" className="block story-link">Collections</a>
-              <a href="#featured" className="block story-link">Featured products</a>
-              <a href="#why" className="block story-link">Why choose us</a>
               <a href="#about" className="block story-link">About</a>
+              <a href="#categories" className="block story-link">Collections</a>
               <a href="#contact" className="block story-link">Contact</a>
+              <a href="#why" className="block story-link">Why choose us</a>
             </div>
           </div>
 
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Contact</p>
             <div className="mt-5 space-y-3 text-sm text-foreground">
-              <a href="tel:+919876543210" className="flex items-center gap-2 story-link"><Phone className="h-3.5 w-3.5" />+91 98765 43210</a>
+              <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 story-link"><Phone className="h-3.5 w-3.5" />{PHONE_DISPLAY}</a>
               <a href="mailto:sales@averyandco.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />sales@averyandco.in</a>
               <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 story-link"><MessageCircle className="h-3.5 w-3.5" />WhatsApp enquiries</a>
             </div>
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Showrooms</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Showroom</p>
             <div className="mt-5 space-y-4 text-sm text-foreground">
               <div>
-                <p className="font-display text-xl">Mumbai</p>
-                <p className="mt-1 text-muted-foreground">14 Linking Road, Bandra West<br />Mon–Sat · 11am–8pm</p>
-              </div>
-              <div>
                 <p className="font-display text-xl">Bengaluru</p>
-                <p className="mt-1 text-muted-foreground">42 Lavelle Road<br />Mon–Sat · 11am–8pm</p>
+                <p className="mt-1 text-muted-foreground">42 Lavelle Road, Bengaluru<br />Mon–Sat · 11am–8pm</p>
               </div>
             </div>
           </div>
