@@ -86,13 +86,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Avery & Co. curates premium furniture collections in warm neutrals, sculpted walnut, and tactile upholstery.",
+          "Avery & Co. — premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery, and a 10-year structural warranty.",
       },
       { property: "og:title", content: "Avery & Co. | Luxury Furniture" },
       {
         property: "og:description",
         content:
-          "A luxury furniture storefront inspired by the quiet elegance of warm beige, walnut brown, and off-white interiors.",
+          "Shop premium sofas, beds, dining tables, and casegoods — hand-built and delivered white-glove across India.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
