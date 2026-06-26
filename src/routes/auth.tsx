@@ -72,40 +72,30 @@ function AuthPage() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Avery &amp; Co.</p>
-              <h1 className="font-display text-3xl text-foreground">Admin sign in</h1>
+              <h1 className="font-display text-3xl text-foreground">{mode === "signup" ? "Create admin account" : "Admin sign in"}</h1>
             </div>
           </div>
-          <form onSubmit={onSubmit} className="mt-8 space-y-5">
+          <div className="mt-6 grid grid-cols-2 gap-1 rounded-full bg-secondary p-1 text-xs uppercase tracking-[0.24em]">
+            <button type="button" onClick={() => setMode("signin")} className={`rounded-full px-3 py-2 transition-colors ${mode === "signin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>Sign in</button>
+            <button type="button" onClick={() => setMode("signup")} className={`rounded-full px-3 py-2 transition-colors ${mode === "signup" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>Sign up</button>
+          </div>
+          <form onSubmit={onSubmit} className="mt-6 space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="h-11"
-              />
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" className="h-11" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="h-11"
-              />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="h-11" />
             </div>
             <Button type="submit" variant="luxury" size="lg" disabled={loading} className="w-full">
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
             </Button>
           </form>
           <p className="mt-6 text-center text-xs leading-6 text-muted-foreground">
-            Admin accounts are provisioned by the owner. Contact the workspace admin if you need access.
+            {mode === "signup"
+              ? "The first account becomes the site administrator automatically. Additional accounts are non-admin by default."
+              : "Forgot password? Contact your workspace admin to reset access."}
           </p>
         </div>
       </div>
