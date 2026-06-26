@@ -149,7 +149,8 @@ function AdminPage() {
   }, [products, query, category, sort]);
 
   async function toggleField(p: Product, field: "featured" | "in_stock", value: boolean) {
-    const { error } = await supabase.from("products").update({ [field]: value }).eq("id", p.id);
+    const update = field === "featured" ? { featured: value } : { in_stock: value };
+    const { error } = await supabase.from("products").update(update).eq("id", p.id);
     if (error) return toast.error(error.message);
     setProducts((prev) => prev.map((x) => (x.id === p.id ? { ...x, [field]: value } : x)));
   }
