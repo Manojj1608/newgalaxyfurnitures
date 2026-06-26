@@ -513,7 +513,52 @@ function HomePage() {
             ))}
           </div>
         )}
+
+        {/* Products from DB (filtered by same search/filter) */}
+        {filteredProducts.length > 0 && (
+          <div className="mt-20">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="space-y-2">
+                <p className="section-kicker">Shop products</p>
+                <h3 className="font-display text-3xl text-foreground sm:text-4xl">
+                  {filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"} available
+                </h3>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="h-3.5 w-3.5" /> Clear filters
+                </Button>
+              )}
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredProducts.map((p) => (
+                <ProductCardLite key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </section>
+
+      {/* Featured products */}
+      {featuredProducts.length > 0 && (
+        <section id="featured" className="page-shell section-shell border-t border-border/60">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl space-y-5">
+              <p className="section-kicker"><Star className="inline h-3 w-3 fill-wood text-wood" /> Featured products</p>
+              <h2 className="section-title">Hand-picked pieces from our latest edit.</h2>
+            </div>
+            <Button variant="outlineWarm" asChild>
+              <a href="#categories">Browse all collections <ArrowRight /></a>
+            </Button>
+          </div>
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProducts.map((p) => (
+              <ProductCardLite key={p.id} product={p} featured />
+            ))}
+          </div>
+        </section>
+      )}
+
 
       {/* Contact */}
       <section id="contact" className="page-shell section-shell border-t border-border/60">
