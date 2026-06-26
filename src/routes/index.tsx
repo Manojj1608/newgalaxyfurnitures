@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  Filter,
   Gem,
   Instagram,
   Linkedin,
@@ -12,8 +13,10 @@ import {
   Quote,
   Search,
   ShieldCheck,
+  Star,
   Trees,
   Truck,
+  X,
   Youtube,
 } from "lucide-react";
 
@@ -21,6 +24,15 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { fetchProducts } from "@/lib/products-api";
+import { formatINR, PRODUCT_CATEGORIES, type Product } from "@/lib/products-config";
 import bedroomImage from "@/assets/category-bedroom.jpg";
 import diningImage from "@/assets/category-dining.jpg";
 import officeImage from "@/assets/category-office.jpg";
@@ -195,16 +207,22 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const filters = useMemo(() => {
-    const set = new Set(categories.map((c) => c.eyebrow));
-    return ["All", ...Array.from(set)];
+  useEffect(() => {
+    fetchProducts().then(setProducts).catch(() => setProducts([]));
   }, []);
+
+  const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
     return categories.filter((c) => {
-      const matchesFilter = activeFilter === "All" || c.eyebrow === activeFilter;
+      const matchesFilter =
+        activeFilter === "All" ||
+        c.title === activeFilter ||
+        c.eyebrow === activeFilter;
       const matchesQuery =
         !q ||
         c.title.toLowerCase().includes(q) ||
@@ -213,6 +231,28 @@ function HomePage() {
       return matchesFilter && matchesQuery;
     });
   }, [query, activeFilter]);
+
+  const filteredProducts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return products.filter((p) => {
+      const matchesFilter = activeFilter === "All" || p.category === activeFilter;
+      const matchesQuery =
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        (p.material ?? "").toLowerCase().includes(q) ||
+        (p.description ?? "").toLowerCase().includes(q);
+      return matchesFilter && matchesQuery && p.in_stock;
+    });
+  }, [products, query, activeFilter]);
+
+  const featuredProducts = useMemo(() => products.filter((p) => p.featured && p.in_stock).slice(0, 6), [products]);
+
+  const hasActiveFilters = query.trim() !== "" || activeFilter !== "All";
+  const clearFilters = () => {
+    setQuery("");
+    setActiveFilter("All");
+  };
 
   return (
     <main className="relative overflow-hidden">
@@ -329,19 +369,61 @@ function HomePage() {
         </div>
 
         {/* Search + filters */}
-        <div className="mt-10 space-y-5">
-          <div className="relative max-w-xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search sofas, walnut tables, outdoor pieces..."
-              aria-label="Search furniture collections"
-              className="h-12 rounded-full border-border/70 bg-background/70 pl-11 pr-4 text-sm backdrop-blur"
-            />
+        <div className="mt-10 space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search sofas, walnut tables, outdoor pieces..."
+                aria-label="Search furniture collections"
+                className="h-12 rounded-full border-border/70 bg-background/70 pl-11 pr-4 text-sm backdrop-blur"
+              />
+            </div>
+            <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outlineWarm" size="lg" className="sm:hidden">
+                  <Filter className="h-4 w-4" />
+                  Filters{activeFilter !== "All" ? ` · ${activeFilter}` : ""}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="rounded-t-3xl">
+                <SheetHeader>
+                  <SheetTitle className="font-display text-2xl">Filter by category</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 grid grid-cols-2 gap-2 px-4 pb-6">
+                  {filters.map((f) => {
+                    const active = activeFilter === f;
+                    return (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => { setActiveFilter(f); setMobileFiltersOpen(false); }}
+                        className={`rounded-full border px-3 py-2.5 text-[11px] uppercase tracking-[0.18em] transition-all ${
+                          active ? "border-wood bg-wood text-wood-foreground" : "border-border/70 bg-background/70 text-foreground"
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="border-t border-border/60 p-4">
+                  <Button variant="ghost" className="w-full" onClick={() => { clearFilters(); setMobileFiltersOpen(false); }} disabled={!hasActiveFilters}>
+                    <X className="h-4 w-4" /> Clear filters
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="hidden sm:inline-flex">
+                <X className="h-3.5 w-3.5" /> Clear filters
+              </Button>
+            )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="hidden flex-wrap gap-2 sm:flex">
             {filters.map((f) => {
               const active = activeFilter === f;
               return (
@@ -431,7 +513,52 @@ function HomePage() {
             ))}
           </div>
         )}
+
+        {/* Products from DB (filtered by same search/filter) */}
+        {filteredProducts.length > 0 && (
+          <div className="mt-20">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="space-y-2">
+                <p className="section-kicker">Shop products</p>
+                <h3 className="font-display text-3xl text-foreground sm:text-4xl">
+                  {filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"} available
+                </h3>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="h-3.5 w-3.5" /> Clear filters
+                </Button>
+              )}
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredProducts.map((p) => (
+                <ProductCardLite key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </section>
+
+      {/* Featured products */}
+      {featuredProducts.length > 0 && (
+        <section id="featured" className="page-shell section-shell border-t border-border/60">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl space-y-5">
+              <p className="section-kicker"><Star className="inline h-3 w-3 fill-wood text-wood" /> Featured products</p>
+              <h2 className="section-title">Hand-picked pieces from our latest edit.</h2>
+            </div>
+            <Button variant="outlineWarm" asChild>
+              <a href="#categories">Browse all collections <ArrowRight /></a>
+            </Button>
+          </div>
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProducts.map((p) => (
+              <ProductCardLite key={p.id} product={p} featured />
+            ))}
+          </div>
+        </section>
+      )}
+
 
       {/* Contact */}
       <section id="contact" className="page-shell section-shell border-t border-border/60">
@@ -646,5 +773,51 @@ function HomePage() {
         <MessageCircle className="h-6 w-6" />
       </a>
     </main>
+  );
+}
+
+function ProductCardLite({ product, featured }: { product: Product; featured?: boolean }) {
+  const primary = product.images[0]?.url;
+  const onSale = product.sale_price !== null && Number(product.sale_price) < Number(product.price);
+  const enquireUrl = `https://wa.me/919513443606?text=${encodeURIComponent(
+    `Hello Avery & Co., I'd like a quote for: ${product.name} (${product.category}).`,
+  )}`;
+  return (
+    <article className="luxury-card image-frame group relative flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_30%,transparent)]">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-muted">
+        {primary ? (
+          <img src={primary} alt={product.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.05]" />
+        ) : (
+          <div className="grid h-full w-full place-content-center text-xs uppercase tracking-[0.3em] text-muted-foreground">No image</div>
+        )}
+        {featured && (
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-wood/95 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-wood-foreground">
+            <Star className="h-3 w-3 fill-current" /> Featured
+          </span>
+        )}
+        {onSale && (
+          <span className="absolute right-4 top-4 rounded-full bg-background/95 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-foreground">Sale</span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-3 p-6">
+        <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">{product.category}</p>
+        <h4 className="font-display text-2xl leading-tight text-foreground">{product.name}</h4>
+        {product.material && <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{product.material}</p>}
+        {product.description && <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{product.description}</p>}
+        <div className="mt-auto flex items-end justify-between gap-3 pt-2">
+          <div>
+            <p className="font-display text-2xl text-foreground">
+              {formatINR(Number(onSale ? product.sale_price! : product.price))}
+            </p>
+            {onSale && (
+              <p className="text-xs text-muted-foreground line-through">{formatINR(Number(product.price))}</p>
+            )}
+          </div>
+          <Button asChild variant="wood" size="sm">
+            <a href={enquireUrl} target="_blank" rel="noreferrer">Enquire</a>
+          </Button>
+        </div>
+      </div>
+    </article>
   );
 }
