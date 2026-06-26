@@ -207,16 +207,22 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const filters = useMemo(() => {
-    const set = new Set(categories.map((c) => c.eyebrow));
-    return ["All", ...Array.from(set)];
+  useEffect(() => {
+    fetchProducts().then(setProducts).catch(() => setProducts([]));
   }, []);
+
+  const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
     return categories.filter((c) => {
-      const matchesFilter = activeFilter === "All" || c.eyebrow === activeFilter;
+      const matchesFilter =
+        activeFilter === "All" ||
+        c.title === activeFilter ||
+        c.eyebrow === activeFilter;
       const matchesQuery =
         !q ||
         c.title.toLowerCase().includes(q) ||
@@ -225,6 +231,28 @@ function HomePage() {
       return matchesFilter && matchesQuery;
     });
   }, [query, activeFilter]);
+
+  const filteredProducts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return products.filter((p) => {
+      const matchesFilter = activeFilter === "All" || p.category === activeFilter;
+      const matchesQuery =
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        (p.material ?? "").toLowerCase().includes(q) ||
+        (p.description ?? "").toLowerCase().includes(q);
+      return matchesFilter && matchesQuery && p.in_stock;
+    });
+  }, [products, query, activeFilter]);
+
+  const featuredProducts = useMemo(() => products.filter((p) => p.featured && p.in_stock).slice(0, 6), [products]);
+
+  const hasActiveFilters = query.trim() !== "" || activeFilter !== "All";
+  const clearFilters = () => {
+    setQuery("");
+    setActiveFilter("All");
+  };
 
   return (
     <main className="relative overflow-hidden">
