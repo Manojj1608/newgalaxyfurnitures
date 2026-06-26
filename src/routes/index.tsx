@@ -775,3 +775,49 @@ function HomePage() {
     </main>
   );
 }
+
+function ProductCardLite({ product, featured }: { product: Product; featured?: boolean }) {
+  const primary = product.images[0]?.url;
+  const onSale = product.sale_price !== null && Number(product.sale_price) < Number(product.price);
+  const enquireUrl = `https://wa.me/919513443606?text=${encodeURIComponent(
+    `Hello Avery & Co., I'd like a quote for: ${product.name} (${product.category}).`,
+  )}`;
+  return (
+    <article className="luxury-card image-frame group relative flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_30%,transparent)]">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-muted">
+        {primary ? (
+          <img src={primary} alt={product.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.05]" />
+        ) : (
+          <div className="grid h-full w-full place-content-center text-xs uppercase tracking-[0.3em] text-muted-foreground">No image</div>
+        )}
+        {featured && (
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-wood/95 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-wood-foreground">
+            <Star className="h-3 w-3 fill-current" /> Featured
+          </span>
+        )}
+        {onSale && (
+          <span className="absolute right-4 top-4 rounded-full bg-background/95 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-foreground">Sale</span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-3 p-6">
+        <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">{product.category}</p>
+        <h4 className="font-display text-2xl leading-tight text-foreground">{product.name}</h4>
+        {product.material && <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{product.material}</p>}
+        {product.description && <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{product.description}</p>}
+        <div className="mt-auto flex items-end justify-between gap-3 pt-2">
+          <div>
+            <p className="font-display text-2xl text-foreground">
+              {formatINR(Number(onSale ? product.sale_price! : product.price))}
+            </p>
+            {onSale && (
+              <p className="text-xs text-muted-foreground line-through">{formatINR(Number(product.price))}</p>
+            )}
+          </div>
+          <Button asChild variant="wood" size="sm">
+            <a href={enquireUrl} target="_blank" rel="noreferrer">Enquire</a>
+          </Button>
+        </div>
+      </div>
+    </article>
+  );
+}
