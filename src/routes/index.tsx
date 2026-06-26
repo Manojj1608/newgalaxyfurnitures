@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  Filter,
   Gem,
   Instagram,
   Linkedin,
@@ -12,8 +13,10 @@ import {
   Quote,
   Search,
   ShieldCheck,
+  Star,
   Trees,
   Truck,
+  X,
   Youtube,
 } from "lucide-react";
 
@@ -21,6 +24,15 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { fetchProducts } from "@/lib/products-api";
+import { formatINR, PRODUCT_CATEGORIES, type Product } from "@/lib/products-config";
 import bedroomImage from "@/assets/category-bedroom.jpg";
 import diningImage from "@/assets/category-dining.jpg";
 import officeImage from "@/assets/category-office.jpg";
