@@ -369,19 +369,61 @@ function HomePage() {
         </div>
 
         {/* Search + filters */}
-        <div className="mt-10 space-y-5">
-          <div className="relative max-w-xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search sofas, walnut tables, outdoor pieces..."
-              aria-label="Search furniture collections"
-              className="h-12 rounded-full border-border/70 bg-background/70 pl-11 pr-4 text-sm backdrop-blur"
-            />
+        <div className="mt-10 space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search sofas, walnut tables, outdoor pieces..."
+                aria-label="Search furniture collections"
+                className="h-12 rounded-full border-border/70 bg-background/70 pl-11 pr-4 text-sm backdrop-blur"
+              />
+            </div>
+            <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outlineWarm" size="lg" className="sm:hidden">
+                  <Filter className="h-4 w-4" />
+                  Filters{activeFilter !== "All" ? ` · ${activeFilter}` : ""}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="rounded-t-3xl">
+                <SheetHeader>
+                  <SheetTitle className="font-display text-2xl">Filter by category</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 grid grid-cols-2 gap-2 px-4 pb-6">
+                  {filters.map((f) => {
+                    const active = activeFilter === f;
+                    return (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => { setActiveFilter(f); setMobileFiltersOpen(false); }}
+                        className={`rounded-full border px-3 py-2.5 text-[11px] uppercase tracking-[0.18em] transition-all ${
+                          active ? "border-wood bg-wood text-wood-foreground" : "border-border/70 bg-background/70 text-foreground"
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="border-t border-border/60 p-4">
+                  <Button variant="ghost" className="w-full" onClick={() => { clearFilters(); setMobileFiltersOpen(false); }} disabled={!hasActiveFilters}>
+                    <X className="h-4 w-4" /> Clear filters
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="hidden sm:inline-flex">
+                <X className="h-3.5 w-3.5" /> Clear filters
+              </Button>
+            )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="hidden flex-wrap gap-2 sm:flex">
             {filters.map((f) => {
               const active = activeFilter === f;
               return (
