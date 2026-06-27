@@ -66,7 +66,7 @@ import {
 } from "@/lib/products-config";
 import { fetchProducts, uploadProductImage, deleteProductImage } from "@/lib/products-api";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/dashboard")({
   head: () => ({
     meta: [
       { title: "Admin Dashboard | Avery & Co." },
@@ -166,7 +166,7 @@ function AdminPage() {
 
   async function signOut() {
     await supabase.auth.signOut();
-    navigate({ to: "/auth" });
+    navigate({ to: "/admin/login" });
   }
 
   if (authLoading) {

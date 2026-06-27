@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeft, Lock } from "lucide-react";
@@ -8,14 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/auth")({
+export const Route = createFileRoute("/admin/login")({
   head: () => ({
     meta: [
       { title: "Admin Sign In | Avery & Co." },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
-  component: AuthPage,
+  component: AdminLoginPage,
   errorComponent: ({ error, reset }) => (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="luxury-card max-w-md p-8 text-center">
@@ -27,31 +27,27 @@ export const Route = createFileRoute("/auth")({
   notFoundComponent: () => <div>Not found</div>,
 });
 
-function AuthPage() {
+function AdminLoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // If already signed in, jump straight to the dashboard.
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) navigate({ to: "/admin/dashboard", replace: true });
+    });
+  }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/admin" },
-        });
-        if (error) throw error;
-        toast.success("Account created — signing you in…");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Signed in");
-      }
-      navigate({ to: "/admin" });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("Signed in");
+      navigate({ to: "/admin/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
@@ -72,12 +68,8 @@ function AuthPage() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Avery &amp; Co.</p>
-              <h1 className="font-display text-3xl text-foreground">{mode === "signup" ? "Create admin account" : "Admin sign in"}</h1>
+              <h1 className="font-display text-3xl text-foreground">Admin sign in</h1>
             </div>
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-1 rounded-full bg-secondary p-1 text-xs uppercase tracking-[0.24em]">
-            <button type="button" onClick={() => setMode("signin")} className={`rounded-full px-3 py-2 transition-colors ${mode === "signin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>Sign in</button>
-            <button type="button" onClick={() => setMode("signup")} className={`rounded-full px-3 py-2 transition-colors ${mode === "signup" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>Sign up</button>
           </div>
           <form onSubmit={onSubmit} className="mt-6 space-y-5">
             <div className="space-y-2">
@@ -86,16 +78,14 @@ function AuthPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="h-11" />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete="current-password" className="h-11" />
             </div>
             <Button type="submit" variant="luxury" size="lg" disabled={loading} className="w-full">
-              {loading ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
+              {loading ? "Please wait…" : "Sign in"}
             </Button>
           </form>
           <p className="mt-6 text-center text-xs leading-6 text-muted-foreground">
-            {mode === "signup"
-              ? "The first account becomes the site administrator automatically. Additional accounts are non-admin by default."
-              : "Forgot password? Contact your workspace admin to reset access."}
+            Restricted area. Admin accounts are provisioned by the site owner — public sign-up is disabled.
           </p>
         </div>
       </div>

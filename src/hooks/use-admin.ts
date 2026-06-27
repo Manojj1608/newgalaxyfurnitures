@@ -13,8 +13,9 @@ export function useAuth(): AuthState {
 
   useEffect(() => {
     let mounted = true;
+    let roleChannel: ReturnType<typeof supabase.channel> | null = null;
 
-    async function refresh(user: User | null) {
+    async function checkRole(user: User | null) {
       if (!user) {
         if (mounted) setState({ loading: false, user: null, isAdmin: false });
         return;
@@ -28,17 +29,52 @@ export function useAuth(): AuthState {
       if (mounted) setState({ loading: false, user, isAdmin: !!data });
     }
 
+    function subscribeRoles(user: User) {
+      if (roleChannel) supabase.removeChannel(roleChannel);
+      roleChannel = supabase
+        .channel(`user_roles:${user.id}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "user_roles", filter: `user_id=eq.${user.id}` },
+          () => checkRole(user),
+        )
+        .subscribe();
+    }
+
+    async function refresh(user: User | null) {
+      await checkRole(user);
+      if (user) subscribeRoles(user);
+      else if (roleChannel) {
+        supabase.removeChannel(roleChannel);
+        roleChannel = null;
+      }
+    }
+
     supabase.auth.getUser().then(({ data }) => refresh(data.user ?? null));
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED" || event === "INITIAL_SESSION") {
+      if (
+        event === "SIGNED_IN" ||
+        event === "SIGNED_OUT" ||
+        event === "USER_UPDATED" ||
+        event === "TOKEN_REFRESHED" ||
+        event === "INITIAL_SESSION"
+      ) {
         refresh(session?.user ?? null);
       }
     });
 
+    // Re-validate when the tab regains focus so external role changes apply immediately.
+    function onFocus() {
+      supabase.auth.getUser().then(({ data }) => checkRole(data.user ?? null));
+    }
+    window.addEventListener("focus", onFocus);
+
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
+      if (roleChannel) supabase.removeChannel(roleChannel);
+      window.removeEventListener("focus", onFocus);
     };
   }, []);
 
