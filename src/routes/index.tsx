@@ -758,7 +758,10 @@ function HomePage() {
         <div className="border-t border-border/60">
           <div className="page-shell flex flex-col gap-3 py-6 text-xs uppercase tracking-[0.28em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <p>© {new Date().getFullYear()} Avery &amp; Co. Atelier Pvt. Ltd.</p>
-            <p>Crafted in India · Delivered worldwide</p>
+            <p className="flex items-center gap-4">
+              <span>Crafted in India · Delivered worldwide</span>
+              <a href="/admin/login" className="opacity-30 transition-opacity hover:opacity-80" aria-label="Admin sign in">·</a>
+            </p>
           </div>
         </div>
       </footer>
