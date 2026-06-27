@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -40,6 +41,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminDashboardRoute =
   AuthenticatedAdminDashboardRouteImport.update({
     id: '/admin/dashboard',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/product/$handle': typeof ProductHandleRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/product/$handle': typeof ProductHandleRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/product/$handle': typeof ProductHandleRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/product/$handle'
     | '/admin/dashboard'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/product/$handle'
     | '/admin/dashboard'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/product/$handle'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -140,6 +152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/dashboard': {
       id: '/_authenticated/admin/dashboard'
       path: '/admin/dashboard'
@@ -152,10 +171,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
