@@ -205,6 +205,8 @@ export const Route = createFileRoute("/")({
         content:
           "Timeless furniture crafted for modern living. Sofas, beds, dining tables, and custom pieces — delivered across Bengaluru and India.",
       },
+    ],
+    scripts: [
       {
         type: "application/ld+json",
         children: JSON.stringify({
