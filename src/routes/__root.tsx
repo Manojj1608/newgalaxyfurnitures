@@ -82,13 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Avery & Co. | Luxury Furniture" },
+      { title: "New Galaxy Furniture | Luxury Furniture" },
       {
         name: "description",
         content:
-          "Avery & Co. — premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery, and a 10-year structural warranty.",
+          "New Galaxy Furniture — premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery, and a 10-year structural warranty.",
       },
-      { property: "og:title", content: "Avery & Co. | Luxury Furniture" },
+      { property: "og:title", content: "New Galaxy Furniture | Luxury Furniture" },
       {
         property: "og:description",
         content:
@@ -96,7 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Avery & Co. | Luxury Furniture" },
+      { name: "twitter:title", content: "New Galaxy Furniture | Luxury Furniture" },
       { name: "description", content: "Haven Home is a premium luxury furniture e-commerce website showcasing elegant, high-end designs." },
       { property: "og:description", content: "Haven Home is a premium luxury furniture e-commerce website showcasing elegant, high-end designs." },
       { name: "twitter:description", content: "Haven Home is a premium luxury furniture e-commerce website showcasing elegant, high-end designs." },

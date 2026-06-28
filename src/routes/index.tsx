@@ -152,7 +152,7 @@ const successStories = [
 const PHONE_DISPLAY = "+91 95134 43606";
 const PHONE_TEL = "+919513443606";
 const WHATSAPP_URL =
-  "https://wa.me/919513443606?text=Hello%20Avery%20%26%20Co.,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
+  "https://wa.me/919513443606?text=Hello%20New%20Galaxy%20Furniture,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
 
 function HomeErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
@@ -185,13 +185,13 @@ function HomeNotFoundComponent() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Avery & Co. | Premium Luxury Furniture" },
+      { title: "New Galaxy Furniture | Premium Luxury Furniture" },
       {
         name: "description",
         content:
           "Premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery across India, and a 10-year structural warranty.",
       },
-      { property: "og:title", content: "Avery & Co. | Premium Luxury Furniture" },
+      { property: "og:title", content: "New Galaxy Furniture | Premium Luxury Furniture" },
       {
         property: "og:description",
         content:
@@ -260,7 +260,7 @@ function HomePage() {
         <div className="page-shell py-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-full border border-white/35 bg-background/70 px-4 py-3 shadow-lg backdrop-blur-xl sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:px-6">
             <div className="min-w-0">
-              <p className="truncate font-display text-2xl text-foreground sm:text-3xl">Avery &amp; Co.</p>
+              <p className="truncate font-display text-2xl text-foreground sm:text-3xl">New Galaxy Furniture</p>
               <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
                 Premium furniture &amp; interiors
               </p>
@@ -330,10 +330,10 @@ function HomePage() {
             />
           </div>
           <div className="space-y-6">
-            <p className="section-kicker">About Avery &amp; Co.</p>
+            <p className="section-kicker">About New Galaxy Furniture</p>
             <h2 className="section-title">A modern luxury furniture house rooted in warmth.</h2>
             <p className="section-copy">
-              Founded in 2007, Avery &amp; Co. is a quiet, editorial furniture house where sculpted
+              Founded in 2007, New Galaxy Furniture is a quiet, editorial furniture house where sculpted
               walnut, warm beige upholstery, and timeless craftsmanship shape every room into a
               softer, more elevated retreat.
             </p>
@@ -597,7 +597,7 @@ function HomePage() {
                   </a>
                 </Button>
                 <Button variant="outlineWarm" size="lg" asChild>
-                  <a href="mailto:sales@averyandco.in?subject=Quote%20request">Request a quote</a>
+                  <a href="mailto:sales@newgalaxyfurniture.in?subject=Quote%20request">Request a quote</a>
                 </Button>
               </div>
             </div>
@@ -608,9 +608,9 @@ function HomePage() {
                   <Phone className="mt-0.5 h-4 w-4 text-wood" />
                   <span><span className="block font-display text-2xl">{PHONE_DISPLAY}</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
                 </a>
-                <a href="mailto:sales@averyandco.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                <a href="mailto:sales@newgalaxyfurniture.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Mail className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">sales@averyandco.in</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
+                  <span><span className="block font-display text-2xl">sales@newgalaxyfurniture.in</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
                 </a>
                 <div className="flex items-start gap-3 text-foreground">
                   <MapPin className="mt-0.5 h-4 w-4 text-wood" />
@@ -708,7 +708,7 @@ function HomePage() {
       <footer className="border-t border-border/60 bg-secondary/40">
         <div className="page-shell grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="space-y-5">
-            <p className="font-display text-4xl text-foreground">Avery &amp; Co.</p>
+            <p className="font-display text-4xl text-foreground">New Galaxy Furniture</p>
             <p className="max-w-md text-sm leading-7 text-muted-foreground">
               A modern luxury furniture house. Bespoke craftsmanship, white-glove delivery, and a
               10-year structural warranty on every piece — for refined homes across India and beyond.
@@ -740,7 +740,7 @@ function HomePage() {
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Contact</p>
             <div className="mt-5 space-y-3 text-sm text-foreground">
               <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 story-link"><Phone className="h-3.5 w-3.5" />{PHONE_DISPLAY}</a>
-              <a href="mailto:sales@averyandco.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />sales@averyandco.in</a>
+              <a href="mailto:sales@newgalaxyfurniture.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />sales@newgalaxyfurniture.in</a>
               <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 story-link"><MessageCircle className="h-3.5 w-3.5" />WhatsApp enquiries</a>
             </div>
           </div>
@@ -757,7 +757,7 @@ function HomePage() {
         </div>
         <div className="border-t border-border/60">
           <div className="page-shell flex flex-col gap-3 py-6 text-xs uppercase tracking-[0.28em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} Avery &amp; Co. Atelier Pvt. Ltd.</p>
+            <p>© {new Date().getFullYear()} New Galaxy Furniture Atelier Pvt. Ltd.</p>
             <p className="flex items-center gap-4">
               <span>Crafted in India · Delivered worldwide</span>
               <a href="/admin/login" className="opacity-30 transition-opacity hover:opacity-80" aria-label="Admin sign in">·</a>
@@ -783,7 +783,7 @@ function ProductCardLite({ product, featured }: { product: Product; featured?: b
   const primary = product.images[0]?.url;
   const onSale = product.sale_price !== null && Number(product.sale_price) < Number(product.price);
   const enquireUrl = `https://wa.me/919513443606?text=${encodeURIComponent(
-    `Hello Avery & Co., I'd like a quote for: ${product.name} (${product.category}).`,
+    `Hello New Galaxy Furniture, I'd like a quote for: ${product.name} (${product.category}).`,
   )}`;
   return (
     <article className="luxury-card image-frame group relative flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_30%,transparent)]">

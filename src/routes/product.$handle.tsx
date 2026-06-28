@@ -50,11 +50,11 @@ export const Route = createFileRoute("/product/$handle")({
   },
   head: ({ loaderData }) => {
     const title = loaderData?.title ?? "Product";
-    const description = loaderData?.description || `Discover ${title} at Avery & Co.`;
+    const description = loaderData?.description || `Discover ${title} at New Galaxy Furniture`;
 
     return {
       meta: [
-        { title: `${title} | Avery & Co.` },
+        { title: `${title} | New Galaxy Furniture` },
         { name: "description", content: description },
       ],
     };
@@ -98,7 +98,7 @@ function ProductPage() {
             </Link>
           </Button>
           <div className="min-w-0">
-            <p className="truncate font-display text-3xl text-foreground">Avery &amp; Co.</p>
+            <p className="truncate font-display text-3xl text-foreground">New Galaxy Furniture</p>
             <p className="truncate text-xs uppercase tracking-[0.28em] text-muted-foreground">
               Product detail
             </p>

@@ -69,7 +69,7 @@ import { fetchProducts, uploadProductImage, deleteProductImage } from "@/lib/pro
 export const Route = createFileRoute("/_authenticated/admin/dashboard")({
   head: () => ({
     meta: [
-      { title: "Admin Dashboard | Avery & Co." },
+      { title: "Admin Dashboard | New Galaxy Furniture" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -200,7 +200,7 @@ function AdminPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Site
             </Link>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Avery &amp; Co.</p>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">New Galaxy Furniture</p>
               <h1 className="font-display text-2xl text-foreground sm:text-3xl">Admin dashboard</h1>
             </div>
           </div>
