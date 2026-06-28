@@ -5,8 +5,8 @@ export const PRODUCT_CATEGORIES = [
   "Accent Chairs",
   "Coffee & Side Tables",
   "Storage & Display",
-  "Executive Office",
-  "Outdoor Living",
+  "Office Furniture",
+  "Outdoor Furniture",
 ] as const;
 
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];

@@ -104,7 +104,7 @@ const categories: Category[] = [
     height: "h-72 lg:h-80",
   },
   {
-    title: "Executive Office",
+    title: "Office Furniture",
     eyebrow: "Office",
     image: officeImage,
     copy: "Walnut desks with leather inlay and lounge-ready seating for considered work.",
@@ -112,7 +112,7 @@ const categories: Category[] = [
     height: "h-72 lg:h-96",
   },
   {
-    title: "Outdoor Living",
+    title: "Outdoor Furniture",
     eyebrow: "Outdoor",
     image: outdoorImage,
     copy: "FSC teak and performance weaves designed for terraces, courtyards, and poolside.",
@@ -122,30 +122,38 @@ const categories: Category[] = [
 ];
 
 const trustMetrics = [
-  { value: "18", label: "Years crafting bespoke furniture" },
-  { value: "2,400+", label: "Homes furnished across India" },
-  { value: "120", label: "Master artisans in our workshop" },
-  { value: "10 yr", label: "Structural warranty on every piece" },
+  { value: "23+", label: "Years serving families since 2002" },
+  { value: "10,000+", label: "Happy customers across India" },
+  { value: "100%", label: "Premium quality materials" },
+  { value: "Custom", label: "Made-to-order options on every piece" },
 ] as const;
 
-const successStories = [
+const trustPillars = [
+  { title: "Established Since 2002", copy: "More than two decades of trusted service and craftsmanship — a family business built on word of mouth." },
+  { title: "Thousands of Happy Customers", copy: "Homes furnished across Bengaluru and India, with repeat customers and referrals every month." },
+  { title: "Premium Quality Materials", copy: "Solid hardwoods, hand-selected fabrics, and durable finishes built to last for generations." },
+  { title: "Custom Furniture Options", copy: "Tell us your size, fabric, and finish — our workshop builds it to fit your home." },
+  { title: "Reliable Delivery & Installation", copy: "On-time white-glove delivery, in-room placement, and assembly handled by our own team." },
+] as const;
+
+const customerReviews = [
   {
-    title: "A Bengaluru penthouse furnished in 9 weeks.",
+    title: "Beautiful sofa, delivered on time.",
     summary:
-      "38 walnut-and-linen pieces selected, manufactured, and white-glove installed on schedule — every order tracked end to end.",
-    client: "Mehta Residence, Bengaluru",
+      "Ordered a custom 3-seater in our preferred fabric. The team measured the room, suggested the right size, and delivered on schedule. Build quality is excellent.",
+    client: "Priya & Arjun · Bengaluru",
   },
   {
-    title: "Outfitting a 14-villa coastal resort.",
+    title: "Quality you can feel.",
     summary:
-      "From dining halls to private terraces, we delivered cohesive furniture in FSC-certified teak and weather-tested upholstery, ahead of opening.",
-    client: "Saira Hospitality Group, Goa",
+      "We furnished our new apartment end to end — dining table, beds, wardrobes. Solid wood, clean joinery, and the after-sales service has been prompt.",
+    client: "Mehta Family · Whitefield",
   },
   {
-    title: "A heritage bungalow restoration.",
+    title: "A trusted local name.",
     summary:
-      "Our workshop hand-built custom seating and casegoods to fit century-old architecture, with on-site finishing and a 10-year warranty.",
-    client: "Rao Family Estate, Bengaluru",
+      "Our family has been buying from New Galaxy Furniture since 2008. Same honest pricing, same craftsmanship. They feel like family at this point.",
+    client: "Rao Residence · Jayanagar",
   },
 ] as const;
 
