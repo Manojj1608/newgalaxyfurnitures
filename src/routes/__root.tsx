@@ -82,26 +82,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "New Galaxy Furniture | Luxury Furniture" },
+      { title: "New Galaxy Furniture | Premium Furniture · Since 2002" },
       {
         name: "description",
         content:
-          "New Galaxy Furniture — premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery, and a 10-year structural warranty.",
+          "New Galaxy Furniture — premium sofas, beds, dining tables, and custom furniture handcrafted in Bengaluru since 2002. Quality materials, reliable delivery across India.",
       },
-      { property: "og:title", content: "New Galaxy Furniture | Luxury Furniture" },
+      { property: "og:site_name", content: "New Galaxy Furniture" },
+      { property: "og:title", content: "New Galaxy Furniture | Premium Furniture · Since 2002" },
       {
         property: "og:description",
         content:
-          "Shop premium sofas, beds, dining tables, and casegoods — hand-built and delivered white-glove across India.",
+          "Timeless furniture crafted for modern living. Sofas, beds, dining tables, and custom pieces — delivered across Bengaluru and India.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "New Galaxy Furniture | Luxury Furniture" },
-      { name: "description", content: "Haven Home is a premium luxury furniture e-commerce website showcasing elegant, high-end designs." },
-      { property: "og:description", content: "Haven Home is a premium luxury furniture e-commerce website showcasing elegant, high-end designs." },
-      { name: "twitter:description", content: "Haven Home is a premium luxury furniture e-commerce website showcasing elegant, high-end designs." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/32020376-d4c7-46b0-bf65-ab88612c4b91/id-preview-3d996bfc--fe19ec73-b00a-4e06-93a9-ee713db7d926.lovable.app-1782489404156.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/32020376-d4c7-46b0-bf65-ab88612c4b91/id-preview-3d996bfc--fe19ec73-b00a-4e06-93a9-ee713db7d926.lovable.app-1782489404156.png" },
+      { name: "twitter:title", content: "New Galaxy Furniture | Premium Furniture · Since 2002" },
+      {
+        name: "twitter:description",
+        content:
+          "Trusted Bengaluru furniture house since 2002 — premium sofas, beds, dining tables, custom pieces, reliable delivery.",
+      },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
