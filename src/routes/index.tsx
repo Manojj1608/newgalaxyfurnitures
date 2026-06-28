@@ -377,23 +377,23 @@ function HomePage() {
           </div>
           <div className="space-y-6">
             <p className="section-kicker">About New Galaxy Furniture</p>
-            <h2 className="section-title">A modern luxury furniture house rooted in warmth.</h2>
+            <h2 className="section-title">A trusted Bengaluru furniture house — since 2002.</h2>
             <p className="section-copy">
-              Founded in 2007, New Galaxy Furniture is a quiet, editorial furniture house where sculpted
-              walnut, warm beige upholstery, and timeless craftsmanship shape every room into a
-              softer, more elevated retreat.
+              New Galaxy Furniture has been serving customers since 2002, offering premium furniture
+              crafted with quality materials, timeless designs, and attention to detail. From our
+              Bengaluru showroom to homes across India, every piece is built to be lived in for years.
             </p>
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="luxury-card p-6">
-                <p className="font-display text-4xl text-wood">01</p>
+                <p className="font-display text-4xl text-wood">23+</p>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  An in-house workshop of 120 master artisans — every piece signed by its maker.
+                  Years of trusted craftsmanship and honest service, run as a family business.
                 </p>
               </div>
               <div className="luxury-card p-6">
-                <p className="font-display text-4xl text-wood">02</p>
+                <p className="font-display text-4xl text-wood">Custom</p>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  Bespoke sizing, fabric, and finish options on every made-to-order piece.
+                  Made-to-order sizing, fabric, and finish on every piece — built in our own workshop.
                 </p>
               </div>
             </div>
