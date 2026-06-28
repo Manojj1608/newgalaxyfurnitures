@@ -160,7 +160,7 @@ const customerReviews = [
 const PHONE_DISPLAY = "+91 95134 43606";
 const PHONE_TEL = "+919513443606";
 const WHATSAPP_URL =
-  "https://wa.me/919513443606?text=Hello%20New%20Galaxy%20Furniture,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
+  "https://wa.me/919513443606?text=Hello%2C%20I%27m%20interested%20in%20your%20furniture%20collection.";
 
 function HomeErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
@@ -193,17 +193,37 @@ function HomeNotFoundComponent() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "New Galaxy Furniture | Premium Luxury Furniture" },
+      { title: "New Galaxy Furniture | Premium Furniture in Bengaluru · Since 2002" },
       {
         name: "description",
         content:
-          "Premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery across India, and a 10-year structural warranty.",
+          "New Galaxy Furniture has been crafting premium sofas, beds, dining tables, and custom furniture in Bengaluru since 2002. Quality materials, expert craftsmanship, reliable delivery.",
       },
-      { property: "og:title", content: "New Galaxy Furniture | Premium Luxury Furniture" },
+      { property: "og:title", content: "New Galaxy Furniture | Premium Furniture · Since 2002" },
       {
         property: "og:description",
         content:
-          "Shop sculptural sofas, walnut dining tables, beds, and casegoods — hand-built and delivered white-glove across India.",
+          "Timeless furniture crafted for modern living. Sofas, beds, dining tables, and custom pieces — delivered across Bengaluru and India.",
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FurnitureStore",
+          name: "New Galaxy Furniture",
+          foundingDate: "2002",
+          telephone: "+91 95134 43606",
+          email: "sales@newgalaxyfurniture.in",
+          url: "https://newgalaxyfurnitures.lovable.app",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "42 Lavelle Road",
+            addressLocality: "Bengaluru",
+            addressRegion: "Karnataka",
+            addressCountry: "IN",
+          },
+          openingHours: "Mo-Sa 10:00-20:00",
+        }),
       },
     ],
   }),
@@ -697,13 +717,18 @@ function HomePage() {
         </div>
 
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {successStories.map((story) => (
+          {customerReviews.map((story) => (
             <article
               key={story.client}
               className="luxury-card flex h-full flex-col gap-5 p-8 transition-all duration-500 hover:-translate-y-1"
             >
               <Quote className="h-6 w-6 text-wood" />
-              <h3 className="font-display text-3xl leading-tight text-foreground">{story.title}</h3>
+              <div className="flex gap-0.5 text-wood">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-current" />
+                ))}
+              </div>
+              <h3 className="font-display text-2xl leading-tight text-foreground">{story.title}</h3>
               <p className="text-sm leading-7 text-muted-foreground">{story.summary}</p>
               <p className="mt-auto border-t border-border/60 pt-5 text-xs uppercase tracking-[0.3em] text-muted-foreground">
                 {story.client}
