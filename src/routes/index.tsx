@@ -104,7 +104,7 @@ const categories: Category[] = [
     height: "h-72 lg:h-80",
   },
   {
-    title: "Executive Office",
+    title: "Office Furniture",
     eyebrow: "Office",
     image: officeImage,
     copy: "Walnut desks with leather inlay and lounge-ready seating for considered work.",
@@ -112,7 +112,7 @@ const categories: Category[] = [
     height: "h-72 lg:h-96",
   },
   {
-    title: "Outdoor Living",
+    title: "Outdoor Furniture",
     eyebrow: "Outdoor",
     image: outdoorImage,
     copy: "FSC teak and performance weaves designed for terraces, courtyards, and poolside.",
@@ -122,37 +122,45 @@ const categories: Category[] = [
 ];
 
 const trustMetrics = [
-  { value: "18", label: "Years crafting bespoke furniture" },
-  { value: "2,400+", label: "Homes furnished across India" },
-  { value: "120", label: "Master artisans in our workshop" },
-  { value: "10 yr", label: "Structural warranty on every piece" },
+  { value: "23+", label: "Years serving families since 2002" },
+  { value: "10,000+", label: "Happy customers across India" },
+  { value: "100%", label: "Premium quality materials" },
+  { value: "Custom", label: "Made-to-order options on every piece" },
 ] as const;
 
-const successStories = [
+const trustPillars = [
+  { title: "Established Since 2002", copy: "More than two decades of trusted service and craftsmanship — a family business built on word of mouth." },
+  { title: "Thousands of Happy Customers", copy: "Homes furnished across Bengaluru and India, with repeat customers and referrals every month." },
+  { title: "Premium Quality Materials", copy: "Solid hardwoods, hand-selected fabrics, and durable finishes built to last for generations." },
+  { title: "Custom Furniture Options", copy: "Tell us your size, fabric, and finish — our workshop builds it to fit your home." },
+  { title: "Reliable Delivery & Installation", copy: "On-time white-glove delivery, in-room placement, and assembly handled by our own team." },
+] as const;
+
+const customerReviews = [
   {
-    title: "A Bengaluru penthouse furnished in 9 weeks.",
+    title: "Beautiful sofa, delivered on time.",
     summary:
-      "38 walnut-and-linen pieces selected, manufactured, and white-glove installed on schedule — every order tracked end to end.",
-    client: "Mehta Residence, Bengaluru",
+      "Ordered a custom 3-seater in our preferred fabric. The team measured the room, suggested the right size, and delivered on schedule. Build quality is excellent.",
+    client: "Priya & Arjun · Bengaluru",
   },
   {
-    title: "Outfitting a 14-villa coastal resort.",
+    title: "Quality you can feel.",
     summary:
-      "From dining halls to private terraces, we delivered cohesive furniture in FSC-certified teak and weather-tested upholstery, ahead of opening.",
-    client: "Saira Hospitality Group, Goa",
+      "We furnished our new apartment end to end — dining table, beds, wardrobes. Solid wood, clean joinery, and the after-sales service has been prompt.",
+    client: "Mehta Family · Whitefield",
   },
   {
-    title: "A heritage bungalow restoration.",
+    title: "A trusted local name.",
     summary:
-      "Our workshop hand-built custom seating and casegoods to fit century-old architecture, with on-site finishing and a 10-year warranty.",
-    client: "Rao Family Estate, Bengaluru",
+      "Our family has been buying from New Galaxy Furniture since 2008. Same honest pricing, same craftsmanship. They feel like family at this point.",
+    client: "Rao Residence · Jayanagar",
   },
 ] as const;
 
 const PHONE_DISPLAY = "+91 95134 43606";
 const PHONE_TEL = "+919513443606";
 const WHATSAPP_URL =
-  "https://wa.me/919513443606?text=Hello%20Avery%20%26%20Co.,%20I%27m%20interested%20in%20your%20furniture%20collection%20and%20would%20like%20a%20quote.";
+  "https://wa.me/919513443606?text=Hello%2C%20I%27m%20interested%20in%20your%20furniture%20collection.";
 
 function HomeErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
@@ -185,17 +193,39 @@ function HomeNotFoundComponent() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Avery & Co. | Premium Luxury Furniture" },
+      { title: "New Galaxy Furniture | Premium Furniture in Bengaluru · Since 2002" },
       {
         name: "description",
         content:
-          "Premium luxury furniture in walnut, beige, and linen. Bespoke craftsmanship, white-glove delivery across India, and a 10-year structural warranty.",
+          "New Galaxy Furniture has been crafting premium sofas, beds, dining tables, and custom furniture in Bengaluru since 2002. Quality materials, expert craftsmanship, reliable delivery.",
       },
-      { property: "og:title", content: "Avery & Co. | Premium Luxury Furniture" },
+      { property: "og:title", content: "New Galaxy Furniture | Premium Furniture · Since 2002" },
       {
         property: "og:description",
         content:
-          "Shop sculptural sofas, walnut dining tables, beds, and casegoods — hand-built and delivered white-glove across India.",
+          "Timeless furniture crafted for modern living. Sofas, beds, dining tables, and custom pieces — delivered across Bengaluru and India.",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FurnitureStore",
+          name: "New Galaxy Furniture",
+          foundingDate: "2002",
+          telephone: "+91 95134 43606",
+          email: "sales@newgalaxyfurniture.in",
+          url: "https://newgalaxyfurnitures.lovable.app",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "42 Lavelle Road",
+            addressLocality: "Bengaluru",
+            addressRegion: "Karnataka",
+            addressCountry: "IN",
+          },
+          openingHours: "Mo-Sa 10:00-20:00",
+        }),
       },
     ],
   }),
@@ -260,9 +290,9 @@ function HomePage() {
         <div className="page-shell py-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-full border border-white/35 bg-background/70 px-4 py-3 shadow-lg backdrop-blur-xl sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:px-6">
             <div className="min-w-0">
-              <p className="truncate font-display text-2xl text-foreground sm:text-3xl">Avery &amp; Co.</p>
+              <p className="truncate font-display text-xl uppercase tracking-[0.18em] text-foreground sm:text-2xl">New Galaxy Furniture</p>
               <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
-                Premium furniture &amp; interiors
+                Since 2002
               </p>
             </div>
             <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 md:flex">
@@ -291,14 +321,14 @@ function HomePage() {
         <div className="page-shell relative flex min-h-screen items-end pb-16 pt-32 sm:pb-24 lg:pb-32">
           <div className="hero-panel max-w-2xl animate-fade-in">
             <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-              A premium luxury furniture showroom
+              Trusted furniture craftsmen · Since 2002
             </Badge>
             <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
-              Furniture curated for luminous, richly layered homes.
+              Timeless Furniture Crafted for Modern Living.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground">
-              Sculptural silhouettes, tactile upholstery, and warm walnut craftsmanship — hand-built
-              in our workshop and delivered white-glove across India.
+              Since 2002, New Galaxy Furniture has been helping families create beautiful homes
+              with quality furniture, expert craftsmanship, and lasting comfort.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
@@ -316,6 +346,22 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Trust pillars */}
+      <section className="page-shell section-shell">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {trustPillars.map((pillar) => (
+            <div
+              key={pillar.title}
+              className="luxury-card flex flex-col gap-3 p-6 transition-all duration-500 hover:-translate-y-1"
+            >
+              <ShieldCheck className="h-5 w-5 text-wood" />
+              <h3 className="font-display text-lg leading-tight text-foreground">{pillar.title}</h3>
+              <p className="text-xs leading-6 text-muted-foreground">{pillar.copy}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* About */}
       <section id="about" className="page-shell section-shell">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
@@ -330,24 +376,24 @@ function HomePage() {
             />
           </div>
           <div className="space-y-6">
-            <p className="section-kicker">About Avery &amp; Co.</p>
-            <h2 className="section-title">A modern luxury furniture house rooted in warmth.</h2>
+            <p className="section-kicker">About New Galaxy Furniture</p>
+            <h2 className="section-title">A trusted Bengaluru furniture house — since 2002.</h2>
             <p className="section-copy">
-              Founded in 2007, Avery &amp; Co. is a quiet, editorial furniture house where sculpted
-              walnut, warm beige upholstery, and timeless craftsmanship shape every room into a
-              softer, more elevated retreat.
+              New Galaxy Furniture has been serving customers since 2002, offering premium furniture
+              crafted with quality materials, timeless designs, and attention to detail. From our
+              Bengaluru showroom to homes across India, every piece is built to be lived in for years.
             </p>
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="luxury-card p-6">
-                <p className="font-display text-4xl text-wood">01</p>
+                <p className="font-display text-4xl text-wood">23+</p>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  An in-house workshop of 120 master artisans — every piece signed by its maker.
+                  Years of trusted craftsmanship and honest service, run as a family business.
                 </p>
               </div>
               <div className="luxury-card p-6">
-                <p className="font-display text-4xl text-wood">02</p>
+                <p className="font-display text-4xl text-wood">Custom</p>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  Bespoke sizing, fabric, and finish options on every made-to-order piece.
+                  Made-to-order sizing, fabric, and finish on every piece — built in our own workshop.
                 </p>
               </div>
             </div>
@@ -576,18 +622,17 @@ function HomePage() {
                 Contact &amp; enquiries
               </Badge>
               <h2 className="font-display text-4xl leading-[1.05] text-foreground sm:text-5xl lg:text-6xl">
-                Enquire about any piece — we&apos;ll respond within 24 hours.
+                Visit our showroom or message us — we&apos;ll respond within 24 hours.
               </h2>
               <p className="max-w-xl text-base leading-8 text-muted-foreground">
                 Share the piece, the room, and your delivery city. Our team will confirm pricing,
-                availability, lead times, and white-glove logistics — all backed by our 10-year
-                structural warranty.
+                availability, lead times, and delivery — backed by 23+ years of trusted service.
               </p>
               <ul className="grid gap-3 text-sm leading-7 text-muted-foreground sm:grid-cols-2">
                 <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Request a quote in writing</li>
                 <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Check availability &amp; lead times</li>
-                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Material &amp; finish details on request</li>
-                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> White-glove delivery &amp; warranty</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Custom sizing, fabric &amp; finish</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Reliable delivery &amp; installation</li>
               </ul>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button variant="wood" size="lg" asChild>
@@ -597,25 +642,42 @@ function HomePage() {
                   </a>
                 </Button>
                 <Button variant="outlineWarm" size="lg" asChild>
-                  <a href="mailto:sales@averyandco.in?subject=Quote%20request">Request a quote</a>
+                  <a href="mailto:sales@newgalaxyfurniture.in?subject=Quote%20request">Request a quote</a>
                 </Button>
               </div>
             </div>
             <div className="space-y-4 rounded-[calc(var(--radius-2xl))] border border-border/70 bg-background/80 p-7 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Direct lines</p>
+              <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Get in touch</p>
               <div className="space-y-4 text-sm">
                 <a href={`tel:${PHONE_TEL}`} className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Phone className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">{PHONE_DISPLAY}</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
+                  <span><span className="block font-display text-xl">{PHONE_DISPLAY}</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Call us · Mon–Sat</span></span>
                 </a>
-                <a href="mailto:sales@averyandco.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                  <MessageCircle className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-xl">WhatsApp us</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{PHONE_DISPLAY}</span></span>
+                </a>
+                <a href="mailto:sales@newgalaxyfurniture.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Mail className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">sales@averyandco.in</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
+                  <span><span className="block font-display text-xl">sales@newgalaxyfurniture.in</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
                 </a>
                 <div className="flex items-start gap-3 text-foreground">
                   <MapPin className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">Bengaluru showroom</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">42 Lavelle Road · Mon–Sat · 11am–8pm</span></span>
+                  <span><span className="block font-display text-xl">Bengaluru Showroom</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">42 Lavelle Road, Bengaluru 560001</span></span>
                 </div>
+                <div className="flex items-start gap-3 text-foreground">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-xl">Mon–Sat · 10am–8pm</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Closed on Sundays</span></span>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-border/60">
+                <iframe
+                  title="New Galaxy Furniture showroom on Google Maps"
+                  src="https://www.google.com/maps?q=Lavelle+Road+Bengaluru&output=embed"
+                  className="h-48 w-full"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
             </div>
           </div>
@@ -689,13 +751,18 @@ function HomePage() {
         </div>
 
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {successStories.map((story) => (
+          {customerReviews.map((story) => (
             <article
               key={story.client}
               className="luxury-card flex h-full flex-col gap-5 p-8 transition-all duration-500 hover:-translate-y-1"
             >
               <Quote className="h-6 w-6 text-wood" />
-              <h3 className="font-display text-3xl leading-tight text-foreground">{story.title}</h3>
+              <div className="flex gap-0.5 text-wood">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-current" />
+                ))}
+              </div>
+              <h3 className="font-display text-2xl leading-tight text-foreground">{story.title}</h3>
               <p className="text-sm leading-7 text-muted-foreground">{story.summary}</p>
               <p className="mt-auto border-t border-border/60 pt-5 text-xs uppercase tracking-[0.3em] text-muted-foreground">
                 {story.client}
@@ -708,10 +775,13 @@ function HomePage() {
       <footer className="border-t border-border/60 bg-secondary/40">
         <div className="page-shell grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="space-y-5">
-            <p className="font-display text-4xl text-foreground">Avery &amp; Co.</p>
+            <div>
+              <p className="font-display text-3xl uppercase tracking-[0.16em] text-foreground">New Galaxy Furniture</p>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.34em] text-muted-foreground">Since 2002</p>
+            </div>
             <p className="max-w-md text-sm leading-7 text-muted-foreground">
-              A modern luxury furniture house. Bespoke craftsmanship, white-glove delivery, and a
-              10-year structural warranty on every piece — for refined homes across India and beyond.
+              A trusted Bengaluru furniture house serving families since 2002 — quality materials,
+              expert craftsmanship, custom options, and reliable delivery across India.
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/60 text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-wood hover:text-wood-foreground">
@@ -740,7 +810,7 @@ function HomePage() {
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Contact</p>
             <div className="mt-5 space-y-3 text-sm text-foreground">
               <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 story-link"><Phone className="h-3.5 w-3.5" />{PHONE_DISPLAY}</a>
-              <a href="mailto:sales@averyandco.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />sales@averyandco.in</a>
+              <a href="mailto:sales@newgalaxyfurniture.in" className="flex items-center gap-2 story-link"><Mail className="h-3.5 w-3.5" />sales@newgalaxyfurniture.in</a>
               <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 story-link"><MessageCircle className="h-3.5 w-3.5" />WhatsApp enquiries</a>
             </div>
           </div>
@@ -750,16 +820,16 @@ function HomePage() {
             <div className="mt-5 space-y-4 text-sm text-foreground">
               <div>
                 <p className="font-display text-xl">Bengaluru</p>
-                <p className="mt-1 text-muted-foreground">42 Lavelle Road, Bengaluru<br />Mon–Sat · 11am–8pm</p>
+                <p className="mt-1 text-muted-foreground">42 Lavelle Road<br />Bengaluru 560001<br />Mon–Sat · 10am–8pm</p>
               </div>
             </div>
           </div>
         </div>
         <div className="border-t border-border/60">
           <div className="page-shell flex flex-col gap-3 py-6 text-xs uppercase tracking-[0.28em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} Avery &amp; Co. Atelier Pvt. Ltd.</p>
+            <p>© {new Date().getFullYear()} New Galaxy Furniture | Since 2002</p>
             <p className="flex items-center gap-4">
-              <span>Crafted in India · Delivered worldwide</span>
+              <span>Crafted with care in Bengaluru · Delivered across India</span>
               <a href="/admin/login" className="opacity-30 transition-opacity hover:opacity-80" aria-label="Admin sign in">·</a>
             </p>
           </div>
@@ -783,7 +853,7 @@ function ProductCardLite({ product, featured }: { product: Product; featured?: b
   const primary = product.images[0]?.url;
   const onSale = product.sale_price !== null && Number(product.sale_price) < Number(product.price);
   const enquireUrl = `https://wa.me/919513443606?text=${encodeURIComponent(
-    `Hello Avery & Co., I'd like a quote for: ${product.name} (${product.category}).`,
+    `Hello, I'm interested in your furniture collection — specifically: ${product.name} (${product.category}).`,
   )}`;
   return (
     <article className="luxury-card image-frame group relative flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_30%,transparent)]">
@@ -816,9 +886,16 @@ function ProductCardLite({ product, featured }: { product: Product; featured?: b
               <p className="text-xs text-muted-foreground line-through">{formatINR(Number(product.price))}</p>
             )}
           </div>
-          <Button asChild variant="wood" size="sm">
-            <a href={enquireUrl} target="_blank" rel="noreferrer">Enquire</a>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outlineWarm" size="sm">
+              <Link to="/product/$handle" params={{ handle: product.slug }}>Quick View</Link>
+            </Button>
+            <Button asChild variant="wood" size="sm">
+              <a href={enquireUrl} target="_blank" rel="noreferrer" aria-label={`Enquire about ${product.name} on WhatsApp`}>
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
     </article>

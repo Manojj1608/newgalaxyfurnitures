@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
     meta: [
-      { title: "Admin Sign In | Avery & Co." },
+      { title: "Admin Sign In | New Galaxy Furniture" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -67,7 +67,7 @@ function AdminLoginPage() {
               <Lock className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Avery &amp; Co.</p>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">New Galaxy Furniture</p>
               <h1 className="font-display text-3xl text-foreground">Admin sign in</h1>
             </div>
           </div>
