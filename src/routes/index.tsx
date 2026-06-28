@@ -820,16 +820,16 @@ function HomePage() {
             <div className="mt-5 space-y-4 text-sm text-foreground">
               <div>
                 <p className="font-display text-xl">Bengaluru</p>
-                <p className="mt-1 text-muted-foreground">42 Lavelle Road, Bengaluru<br />Mon–Sat · 11am–8pm</p>
+                <p className="mt-1 text-muted-foreground">42 Lavelle Road<br />Bengaluru 560001<br />Mon–Sat · 10am–8pm</p>
               </div>
             </div>
           </div>
         </div>
         <div className="border-t border-border/60">
           <div className="page-shell flex flex-col gap-3 py-6 text-xs uppercase tracking-[0.28em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} New Galaxy Furniture Atelier Pvt. Ltd.</p>
+            <p>© {new Date().getFullYear()} New Galaxy Furniture | Since 2002</p>
             <p className="flex items-center gap-4">
-              <span>Crafted in India · Delivered worldwide</span>
+              <span>Crafted with care in Bengaluru · Delivered across India</span>
               <a href="/admin/login" className="opacity-30 transition-opacity hover:opacity-80" aria-label="Admin sign in">·</a>
             </p>
           </div>
