@@ -290,9 +290,9 @@ function HomePage() {
         <div className="page-shell py-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-full border border-white/35 bg-background/70 px-4 py-3 shadow-lg backdrop-blur-xl sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:px-6">
             <div className="min-w-0">
-              <p className="truncate font-display text-2xl text-foreground sm:text-3xl">New Galaxy Furniture</p>
+              <p className="truncate font-display text-xl uppercase tracking-[0.18em] text-foreground sm:text-2xl">New Galaxy Furniture</p>
               <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
-                Premium furniture &amp; interiors
+                Since 2002
               </p>
             </div>
             <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 md:flex">
@@ -321,14 +321,14 @@ function HomePage() {
         <div className="page-shell relative flex min-h-screen items-end pb-16 pt-32 sm:pb-24 lg:pb-32">
           <div className="hero-panel max-w-2xl animate-fade-in">
             <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-              A premium luxury furniture showroom
+              Trusted furniture craftsmen · Since 2002
             </Badge>
             <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
-              Furniture curated for luminous, richly layered homes.
+              Timeless Furniture Crafted for Modern Living.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground">
-              Sculptural silhouettes, tactile upholstery, and warm walnut craftsmanship — hand-built
-              in our workshop and delivered white-glove across India.
+              Since 2002, New Galaxy Furniture has been helping families create beautiful homes
+              with quality furniture, expert craftsmanship, and lasting comfort.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
@@ -343,6 +343,22 @@ function HomePage() {
               </Button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Trust pillars */}
+      <section className="page-shell section-shell">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {trustPillars.map((pillar) => (
+            <div
+              key={pillar.title}
+              className="luxury-card flex flex-col gap-3 p-6 transition-all duration-500 hover:-translate-y-1"
+            >
+              <ShieldCheck className="h-5 w-5 text-wood" />
+              <h3 className="font-display text-lg leading-tight text-foreground">{pillar.title}</h3>
+              <p className="text-xs leading-6 text-muted-foreground">{pillar.copy}</p>
+            </div>
+          ))}
         </div>
       </section>
 
