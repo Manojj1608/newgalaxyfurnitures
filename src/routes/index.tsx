@@ -622,18 +622,17 @@ function HomePage() {
                 Contact &amp; enquiries
               </Badge>
               <h2 className="font-display text-4xl leading-[1.05] text-foreground sm:text-5xl lg:text-6xl">
-                Enquire about any piece — we&apos;ll respond within 24 hours.
+                Visit our showroom or message us — we&apos;ll respond within 24 hours.
               </h2>
               <p className="max-w-xl text-base leading-8 text-muted-foreground">
                 Share the piece, the room, and your delivery city. Our team will confirm pricing,
-                availability, lead times, and white-glove logistics — all backed by our 10-year
-                structural warranty.
+                availability, lead times, and delivery — backed by 23+ years of trusted service.
               </p>
               <ul className="grid gap-3 text-sm leading-7 text-muted-foreground sm:grid-cols-2">
                 <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Request a quote in writing</li>
                 <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Check availability &amp; lead times</li>
-                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Material &amp; finish details on request</li>
-                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> White-glove delivery &amp; warranty</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Custom sizing, fabric &amp; finish</li>
+                <li className="flex items-start gap-3"><ShieldCheck className="mt-1 h-4 w-4 text-wood" /> Reliable delivery &amp; installation</li>
               </ul>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button variant="wood" size="lg" asChild>
@@ -648,20 +647,37 @@ function HomePage() {
               </div>
             </div>
             <div className="space-y-4 rounded-[calc(var(--radius-2xl))] border border-border/70 bg-background/80 p-7 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Direct lines</p>
+              <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Get in touch</p>
               <div className="space-y-4 text-sm">
                 <a href={`tel:${PHONE_TEL}`} className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Phone className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">{PHONE_DISPLAY}</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Mon–Sat · 10am–7pm IST</span></span>
+                  <span><span className="block font-display text-xl">{PHONE_DISPLAY}</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Call us · Mon–Sat</span></span>
+                </a>
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
+                  <MessageCircle className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-xl">WhatsApp us</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{PHONE_DISPLAY}</span></span>
                 </a>
                 <a href="mailto:sales@newgalaxyfurniture.in" className="flex items-start gap-3 text-foreground transition-colors hover:text-wood">
                   <Mail className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">sales@newgalaxyfurniture.in</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
+                  <span><span className="block font-display text-xl">sales@newgalaxyfurniture.in</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Replies within 24 hours</span></span>
                 </a>
                 <div className="flex items-start gap-3 text-foreground">
                   <MapPin className="mt-0.5 h-4 w-4 text-wood" />
-                  <span><span className="block font-display text-2xl">Bengaluru showroom</span><span className="text-xs uppercase tracking-[0.28em] text-muted-foreground">42 Lavelle Road · Mon–Sat · 11am–8pm</span></span>
+                  <span><span className="block font-display text-xl">Bengaluru Showroom</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">42 Lavelle Road, Bengaluru 560001</span></span>
                 </div>
+                <div className="flex items-start gap-3 text-foreground">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 text-wood" />
+                  <span><span className="block font-display text-xl">Mon–Sat · 10am–8pm</span><span className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Closed on Sundays</span></span>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-border/60">
+                <iframe
+                  title="New Galaxy Furniture showroom on Google Maps"
+                  src="https://www.google.com/maps?q=Lavelle+Road+Bengaluru&output=embed"
+                  className="h-48 w-full"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
             </div>
           </div>
