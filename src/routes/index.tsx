@@ -775,10 +775,13 @@ function HomePage() {
       <footer className="border-t border-border/60 bg-secondary/40">
         <div className="page-shell grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="space-y-5">
-            <p className="font-display text-4xl text-foreground">New Galaxy Furniture</p>
+            <div>
+              <p className="font-display text-3xl uppercase tracking-[0.16em] text-foreground">New Galaxy Furniture</p>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.34em] text-muted-foreground">Since 2002</p>
+            </div>
             <p className="max-w-md text-sm leading-7 text-muted-foreground">
-              A modern luxury furniture house. Bespoke craftsmanship, white-glove delivery, and a
-              10-year structural warranty on every piece — for refined homes across India and beyond.
+              A trusted Bengaluru furniture house serving families since 2002 — quality materials,
+              expert craftsmanship, custom options, and reliable delivery across India.
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/60 text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-wood hover:text-wood-foreground">
