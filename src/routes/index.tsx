@@ -853,7 +853,7 @@ function ProductCardLite({ product, featured }: { product: Product; featured?: b
   const primary = product.images[0]?.url;
   const onSale = product.sale_price !== null && Number(product.sale_price) < Number(product.price);
   const enquireUrl = `https://wa.me/919513443606?text=${encodeURIComponent(
-    `Hello New Galaxy Furniture, I'd like a quote for: ${product.name} (${product.category}).`,
+    `Hello, I'm interested in your furniture collection — specifically: ${product.name} (${product.category}).`,
   )}`;
   return (
     <article className="luxury-card image-frame group relative flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--color-foreground)_30%,transparent)]">
@@ -886,9 +886,16 @@ function ProductCardLite({ product, featured }: { product: Product; featured?: b
               <p className="text-xs text-muted-foreground line-through">{formatINR(Number(product.price))}</p>
             )}
           </div>
-          <Button asChild variant="wood" size="sm">
-            <a href={enquireUrl} target="_blank" rel="noreferrer">Enquire</a>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outlineWarm" size="sm">
+              <Link to="/product/$handle" params={{ handle: product.slug }}>Quick View</Link>
+            </Button>
+            <Button asChild variant="wood" size="sm">
+              <a href={enquireUrl} target="_blank" rel="noreferrer" aria-label={`Enquire about ${product.name} on WhatsApp`}>
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
     </article>
