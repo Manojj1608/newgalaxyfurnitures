@@ -162,6 +162,32 @@ const PHONE_TEL = "+919513443606";
 const WHATSAPP_URL =
   "https://wa.me/919513443606?text=Hello%2C%20I%27m%20interested%20in%20your%20furniture%20collection.";
 
+function NGMonogram({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="ng-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f6e2b3" />
+          <stop offset="45%" stopColor="#d4af6a" />
+          <stop offset="100%" stopColor="#8a6a2f" />
+        </linearGradient>
+      </defs>
+      {/* Galaxy rings */}
+      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="url(#ng-gold)" strokeOpacity="0.55" strokeWidth="0.9" transform="rotate(-22 32 32)" />
+      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="url(#ng-gold)" strokeOpacity="0.35" strokeWidth="0.7" transform="rotate(22 32 32)" />
+      <circle cx="32" cy="32" r="20" fill="none" stroke="url(#ng-gold)" strokeOpacity="0.9" strokeWidth="1" />
+      {/* NG monogram */}
+      <g fill="url(#ng-gold)" fontFamily="Georgia, 'Times New Roman', serif" fontWeight="600">
+        <text x="32" y="39" textAnchor="middle" fontSize="20" letterSpacing="-1">NG</text>
+      </g>
+      {/* Tiny stars */}
+      <circle cx="10" cy="20" r="0.8" fill="url(#ng-gold)" />
+      <circle cx="54" cy="46" r="0.8" fill="url(#ng-gold)" />
+      <circle cx="50" cy="14" r="0.6" fill="url(#ng-gold)" opacity="0.7" />
+    </svg>
+  );
+}
+
 function HomeErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="page-shell flex min-h-screen items-center justify-center py-16">
