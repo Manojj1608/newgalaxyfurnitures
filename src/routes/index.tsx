@@ -807,9 +807,12 @@ function HomePage() {
       <footer className="border-t border-border/60 bg-secondary/40">
         <div className="page-shell grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="space-y-5">
-            <div>
-              <p className="font-display text-3xl uppercase tracking-[0.16em] text-foreground">New Galaxy Furniture</p>
-              <p className="mt-1 text-[11px] uppercase tracking-[0.34em] text-muted-foreground">Since 2002</p>
+            <div className="flex items-center gap-3">
+              <NGMonogram className="h-14 w-14 shrink-0" />
+              <div>
+                <p className="font-display text-2xl uppercase tracking-[0.16em] text-foreground">New Galaxy Furniture</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.34em] text-muted-foreground">Premium Furniture Since 2002</p>
+              </div>
             </div>
             <p className="max-w-md text-sm leading-7 text-muted-foreground">
               A trusted Bengaluru furniture house serving families since 2002 — quality materials,
