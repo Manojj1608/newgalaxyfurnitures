@@ -289,17 +289,22 @@ function HomePage() {
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="page-shell py-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-full border border-white/35 bg-background/70 px-4 py-3 shadow-lg backdrop-blur-xl sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:px-6">
-            <div className="min-w-0">
-              <p className="truncate font-display text-xl uppercase tracking-[0.18em] text-foreground sm:text-2xl">New Galaxy Furniture</p>
-              <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
-                Since 2002
-              </p>
-            </div>
-            <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 md:flex">
-              <a href="#about" className="story-link">About</a>
+            <a href="#top" className="flex min-w-0 items-center gap-3">
+              <NGMonogram className="h-11 w-11 shrink-0" />
+              <div className="min-w-0">
+                <p className="truncate font-display text-lg uppercase tracking-[0.18em] text-foreground sm:text-xl">New Galaxy Furniture</p>
+                <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
+                  Premium Furniture Since 2002
+                </p>
+              </div>
+            </a>
+            <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 lg:flex">
+              <a href="#top" className="story-link">Home</a>
               <a href="#categories" className="story-link">Collections</a>
+              <a href="#categories" className="story-link">Living Room</a>
+              <a href="#categories" className="story-link">Bedroom</a>
+              <a href="#categories" className="story-link">Dining</a>
               <a href="#contact" className="story-link">Contact</a>
-              <a href="#why" className="story-link">Why us</a>
             </nav>
             <div className="justify-self-end">
               <CartDrawer />
@@ -308,7 +313,7 @@ function HomePage() {
         </div>
       </header>
 
-      <section className="relative min-h-screen">
+      <section id="top" className="relative min-h-screen">
         <img
           src={heroImage}
           alt="Luxury living room with warm walnut and off-white furnishings"
@@ -321,25 +326,26 @@ function HomePage() {
         <div className="page-shell relative flex min-h-screen items-end pb-16 pt-32 sm:pb-24 lg:pb-32">
           <div className="hero-panel max-w-2xl animate-fade-in">
             <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-              Trusted furniture craftsmen · Since 2002
+              Trusted Furniture Experts · Since 2002
             </Badge>
             <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
-              Timeless Furniture Crafted for Modern Living.
+              Luxury Furniture Crafted for Modern Living.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground">
-              Since 2002, New Galaxy Furniture has been helping families create beautiful homes
-              with quality furniture, expert craftsmanship, and lasting comfort.
+              Since 2002, New Galaxy Furniture has been creating elegant living spaces with premium
+              sofas, beds, dining sets, wardrobes, and custom furniture designed for comfort, style,
+              and durability.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
               <Button variant="luxury" size="lg" asChild>
                 <a href="#categories">
-                  Browse collections
+                  Explore Collection
                   <ArrowRight />
                 </a>
               </Button>
               <Button variant="outlineWarm" size="lg" asChild>
-                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">Enquire on WhatsApp</a>
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">WhatsApp Inquiry</a>
               </Button>
             </div>
           </div>
