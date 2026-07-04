@@ -162,6 +162,32 @@ const PHONE_TEL = "+919513443606";
 const WHATSAPP_URL =
   "https://wa.me/919513443606?text=Hello%2C%20I%27m%20interested%20in%20your%20furniture%20collection.";
 
+function NGMonogram({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="ng-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f6e2b3" />
+          <stop offset="45%" stopColor="#d4af6a" />
+          <stop offset="100%" stopColor="#8a6a2f" />
+        </linearGradient>
+      </defs>
+      {/* Galaxy rings */}
+      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="url(#ng-gold)" strokeOpacity="0.55" strokeWidth="0.9" transform="rotate(-22 32 32)" />
+      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="url(#ng-gold)" strokeOpacity="0.35" strokeWidth="0.7" transform="rotate(22 32 32)" />
+      <circle cx="32" cy="32" r="20" fill="none" stroke="url(#ng-gold)" strokeOpacity="0.9" strokeWidth="1" />
+      {/* NG monogram */}
+      <g fill="url(#ng-gold)" fontFamily="Georgia, 'Times New Roman', serif" fontWeight="600">
+        <text x="32" y="39" textAnchor="middle" fontSize="20" letterSpacing="-1">NG</text>
+      </g>
+      {/* Tiny stars */}
+      <circle cx="10" cy="20" r="0.8" fill="url(#ng-gold)" />
+      <circle cx="54" cy="46" r="0.8" fill="url(#ng-gold)" />
+      <circle cx="50" cy="14" r="0.6" fill="url(#ng-gold)" opacity="0.7" />
+    </svg>
+  );
+}
+
 function HomeErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="page-shell flex min-h-screen items-center justify-center py-16">
@@ -289,17 +315,22 @@ function HomePage() {
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="page-shell py-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-full border border-white/35 bg-background/70 px-4 py-3 shadow-lg backdrop-blur-xl sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:px-6">
-            <div className="min-w-0">
-              <p className="truncate font-display text-xl uppercase tracking-[0.18em] text-foreground sm:text-2xl">New Galaxy Furniture</p>
-              <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
-                Since 2002
-              </p>
-            </div>
-            <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 md:flex">
-              <a href="#about" className="story-link">About</a>
+            <a href="#top" className="flex min-w-0 items-center gap-3">
+              <NGMonogram className="h-11 w-11 shrink-0" />
+              <div className="min-w-0">
+                <p className="truncate font-display text-lg uppercase tracking-[0.18em] text-foreground sm:text-xl">New Galaxy Furniture</p>
+                <p className="text-[10px] uppercase tracking-[0.34em] text-muted-foreground sm:text-xs">
+                  Premium Furniture Since 2002
+                </p>
+              </div>
+            </a>
+            <nav className="hidden min-w-0 items-center justify-center gap-6 text-sm text-foreground/80 lg:flex">
+              <a href="#top" className="story-link">Home</a>
               <a href="#categories" className="story-link">Collections</a>
+              <a href="#categories" className="story-link">Living Room</a>
+              <a href="#categories" className="story-link">Bedroom</a>
+              <a href="#categories" className="story-link">Dining</a>
               <a href="#contact" className="story-link">Contact</a>
-              <a href="#why" className="story-link">Why us</a>
             </nav>
             <div className="justify-self-end">
               <CartDrawer />
@@ -308,7 +339,7 @@ function HomePage() {
         </div>
       </header>
 
-      <section className="relative min-h-screen">
+      <section id="top" className="relative min-h-screen">
         <img
           src={heroImage}
           alt="Luxury living room with warm walnut and off-white furnishings"
@@ -321,25 +352,26 @@ function HomePage() {
         <div className="page-shell relative flex min-h-screen items-end pb-16 pt-32 sm:pb-24 lg:pb-32">
           <div className="hero-panel max-w-2xl animate-fade-in">
             <Badge variant="outline" className="rounded-full border-border/80 bg-background/80 px-4 py-1.5 text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-              Trusted furniture craftsmen · Since 2002
+              Trusted Furniture Experts · Since 2002
             </Badge>
             <h1 className="mt-6 font-display text-4xl leading-[0.98] text-foreground sm:text-[2.9rem] lg:text-[4.2rem]">
-              Timeless Furniture Crafted for Modern Living.
+              Luxury Furniture Crafted for Modern Living.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground">
-              Since 2002, New Galaxy Furniture has been helping families create beautiful homes
-              with quality furniture, expert craftsmanship, and lasting comfort.
+              Since 2002, New Galaxy Furniture has been creating elegant living spaces with premium
+              sofas, beds, dining sets, wardrobes, and custom furniture designed for comfort, style,
+              and durability.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
               <Button variant="luxury" size="lg" asChild>
                 <a href="#categories">
-                  Browse collections
+                  Explore Collection
                   <ArrowRight />
                 </a>
               </Button>
               <Button variant="outlineWarm" size="lg" asChild>
-                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">Enquire on WhatsApp</a>
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">WhatsApp Inquiry</a>
               </Button>
             </div>
           </div>
@@ -775,9 +807,12 @@ function HomePage() {
       <footer className="border-t border-border/60 bg-secondary/40">
         <div className="page-shell grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="space-y-5">
-            <div>
-              <p className="font-display text-3xl uppercase tracking-[0.16em] text-foreground">New Galaxy Furniture</p>
-              <p className="mt-1 text-[11px] uppercase tracking-[0.34em] text-muted-foreground">Since 2002</p>
+            <div className="flex items-center gap-3">
+              <NGMonogram className="h-14 w-14 shrink-0" />
+              <div>
+                <p className="font-display text-2xl uppercase tracking-[0.16em] text-foreground">New Galaxy Furniture</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.34em] text-muted-foreground">Premium Furniture Since 2002</p>
+              </div>
             </div>
             <p className="max-w-md text-sm leading-7 text-muted-foreground">
               A trusted Bengaluru furniture house serving families since 2002 — quality materials,
