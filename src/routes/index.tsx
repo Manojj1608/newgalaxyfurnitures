@@ -32,6 +32,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { fetchProducts } from "@/lib/products-api";
+import { supabase } from "@/integrations/supabase/client";
+
 import { formatINR, PRODUCT_CATEGORIES, type Product } from "@/lib/products-config";
 import bedroomImage from "@/assets/category-bedroom.jpg";
 import diningImage from "@/assets/category-dining.jpg";
