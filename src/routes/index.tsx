@@ -267,8 +267,22 @@ function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetchProducts().then(setProducts).catch(() => setProducts([]));
+    let mounted = true;
+    const load = () =>
+      fetchProducts()
+        .then((p) => { if (mounted) setProducts(p); })
+        .catch(() => { if (mounted) setProducts([]); });
+    load();
+    const channel = supabase
+      .channel("products:home")
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
+      .subscribe();
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
+
 
   const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
