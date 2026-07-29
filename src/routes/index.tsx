@@ -32,6 +32,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { fetchProducts } from "@/lib/products-api";
+import { supabase } from "@/integrations/supabase/client";
+
 import { formatINR, PRODUCT_CATEGORIES, type Product } from "@/lib/products-config";
 import bedroomImage from "@/assets/category-bedroom.jpg";
 import diningImage from "@/assets/category-dining.jpg";
@@ -267,8 +269,22 @@ function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetchProducts().then(setProducts).catch(() => setProducts([]));
+    let mounted = true;
+    const load = () =>
+      fetchProducts()
+        .then((p) => { if (mounted) setProducts(p); })
+        .catch(() => { if (mounted) setProducts([]); });
+    load();
+    const channel = supabase
+      .channel("products:home")
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, load)
+      .subscribe();
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
+
 
   const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 

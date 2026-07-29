@@ -12,6 +12,17 @@ export async function fetchProducts(): Promise<Product[]> {
   return (data ?? []) as unknown as Product[];
 }
 
+export async function fetchProductBySlug(slug: string): Promise<Product | null> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data ?? null) as unknown as Product | null;
+}
+
+
 export async function uploadProductImage(file: File): Promise<ProductImage> {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${crypto.randomUUID()}.${ext}`;
