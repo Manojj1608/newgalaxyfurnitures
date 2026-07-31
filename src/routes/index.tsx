@@ -262,9 +262,50 @@ export const Route = createFileRoute("/")({
   notFoundComponent: HomeNotFoundComponent,
 });
 
+function FilterChip({
+  active,
+  onClick,
+  compact,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  compact?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-full border transition-all duration-300 ${
+        compact
+          ? "px-3 py-2.5 text-[11px] uppercase tracking-[0.18em]"
+          : "px-4 py-2 text-xs uppercase tracking-[0.24em]"
+      } ${
+        active
+          ? "border-wood bg-wood text-wood-foreground shadow-sm"
+          : "border-border/70 bg-background/60 text-muted-foreground hover:-translate-y-0.5 hover:border-wood/60 hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+const PRICE_RANGES = [
+  { id: "All", label: "Any price", min: 0, max: Infinity },
+  { id: "u25", label: "Under ₹25k", min: 0, max: 25000 },
+  { id: "25-50", label: "₹25k – ₹50k", min: 25000, max: 50000 },
+  { id: "50-100", label: "₹50k – ₹1L", min: 50000, max: 100000 },
+  { id: "100+", label: "₹1L & above", min: 100000, max: Infinity },
+] as const;
+
 function HomePage() {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
+  const [activePrice, setActivePrice] = useState<string>("All");
+  const [activeMaterial, setActiveMaterial] = useState<string>("All");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
@@ -288,6 +329,19 @@ function HomePage() {
 
   const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
+  const materials = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of products) {
+      const m = (p.material ?? "").trim();
+      if (m) set.add(m);
+    }
+    return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [products]);
+
+  useEffect(() => {
+    if (activeMaterial !== "All" && !materials.includes(activeMaterial)) setActiveMaterial("All");
+  }, [materials, activeMaterial]);
+
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
     return categories.filter((c) => {
@@ -306,25 +360,35 @@ function HomePage() {
 
   const filteredProducts = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const range = PRICE_RANGES.find((r) => r.id === activePrice) ?? PRICE_RANGES[0];
     return products.filter((p) => {
       const matchesFilter = activeFilter === "All" || p.category === activeFilter;
+      const effectivePrice = p.sale_price ?? p.price;
+      const matchesPrice = effectivePrice >= range.min && effectivePrice < range.max;
+      const matchesMaterial =
+        activeMaterial === "All" || (p.material ?? "").trim() === activeMaterial;
       const matchesQuery =
         !q ||
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
         (p.material ?? "").toLowerCase().includes(q) ||
         (p.description ?? "").toLowerCase().includes(q);
-      return matchesFilter && matchesQuery && p.in_stock;
+      return matchesFilter && matchesPrice && matchesMaterial && matchesQuery && p.in_stock;
     });
-  }, [products, query, activeFilter]);
+  }, [products, query, activeFilter, activePrice, activeMaterial]);
 
   const featuredProducts = useMemo(() => products.filter((p) => p.featured && p.in_stock).slice(0, 6), [products]);
 
-  const hasActiveFilters = query.trim() !== "" || activeFilter !== "All";
+  const activeFilterCount =
+    (activeFilter !== "All" ? 1 : 0) + (activePrice !== "All" ? 1 : 0) + (activeMaterial !== "All" ? 1 : 0);
+  const hasActiveFilters = query.trim() !== "" || activeFilterCount > 0;
   const clearFilters = () => {
     setQuery("");
     setActiveFilter("All");
+    setActivePrice("All");
+    setActiveMaterial("All");
   };
+
 
   return (
     <main className="relative overflow-hidden">
@@ -480,33 +544,53 @@ function HomePage() {
               <SheetTrigger asChild>
                 <Button variant="outlineWarm" size="lg" className="sm:hidden">
                   <Filter className="h-4 w-4" />
-                  Filters{activeFilter !== "All" ? ` · ${activeFilter}` : ""}
+                  Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="rounded-t-3xl">
+              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl">
                 <SheetHeader>
-                  <SheetTitle className="font-display text-2xl">Filter by category</SheetTitle>
+                  <SheetTitle className="font-display text-2xl">Filters</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4 grid grid-cols-2 gap-2 px-4 pb-6">
-                  {filters.map((f) => {
-                    const active = activeFilter === f;
-                    return (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() => { setActiveFilter(f); setMobileFiltersOpen(false); }}
-                        className={`rounded-full border px-3 py-2.5 text-[11px] uppercase tracking-[0.18em] transition-all ${
-                          active ? "border-wood bg-wood text-wood-foreground" : "border-border/70 bg-background/70 text-foreground"
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    );
-                  })}
+                <div className="space-y-6 px-4 pb-6 pt-4">
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Category</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {filters.map((f) => (
+                        <FilterChip key={f} active={activeFilter === f} onClick={() => setActiveFilter(f)} compact>
+                          {f}
+                        </FilterChip>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Price range</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {PRICE_RANGES.map((r) => (
+                        <FilterChip key={r.id} active={activePrice === r.id} onClick={() => setActivePrice(r.id)} compact>
+                          {r.label}
+                        </FilterChip>
+                      ))}
+                    </div>
+                  </div>
+                  {materials.length > 1 && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Material</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {materials.map((m) => (
+                          <FilterChip key={m} active={activeMaterial === m} onClick={() => setActiveMaterial(m)} compact>
+                            {m}
+                          </FilterChip>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="border-t border-border/60 p-4">
-                  <Button variant="ghost" className="w-full" onClick={() => { clearFilters(); setMobileFiltersOpen(false); }} disabled={!hasActiveFilters}>
-                    <X className="h-4 w-4" /> Clear filters
+                <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-border/60 bg-background p-4">
+                  <Button variant="ghost" onClick={clearFilters} disabled={!hasActiveFilters}>
+                    <X className="h-4 w-4" /> Clear
+                  </Button>
+                  <Button variant="wood" onClick={() => setMobileFiltersOpen(false)}>
+                    Show {filteredProducts.length} pieces
                   </Button>
                 </div>
               </SheetContent>
@@ -517,27 +601,36 @@ function HomePage() {
               </Button>
             )}
           </div>
-          <div className="hidden flex-wrap gap-2 sm:flex">
-            {filters.map((f) => {
-              const active = activeFilter === f;
-              return (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setActiveFilter(f)}
-                  className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.24em] transition-all duration-300 ${
-                    active
-                      ? "border-wood bg-wood text-wood-foreground shadow-sm"
-                      : "border-border/70 bg-background/60 text-muted-foreground hover:-translate-y-0.5 hover:border-wood/60 hover:text-foreground"
-                  }`}
-                  aria-pressed={active}
-                >
+          <div className="hidden flex-col gap-3 sm:flex">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Category</span>
+              {filters.map((f) => (
+                <FilterChip key={f} active={activeFilter === f} onClick={() => setActiveFilter(f)}>
                   {f}
-                </button>
-              );
-            })}
+                </FilterChip>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Price</span>
+              {PRICE_RANGES.map((r) => (
+                <FilterChip key={r.id} active={activePrice === r.id} onClick={() => setActivePrice(r.id)}>
+                  {r.label}
+                </FilterChip>
+              ))}
+            </div>
+            {materials.length > 1 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Material</span>
+                {materials.map((m) => (
+                  <FilterChip key={m} active={activeMaterial === m} onClick={() => setActiveMaterial(m)}>
+                    {m}
+                  </FilterChip>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
 
         {filteredCategories.length === 0 ? (
           <div className="luxury-card mt-12 p-10 text-center">
