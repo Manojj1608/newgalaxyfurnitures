@@ -262,6 +262,37 @@ export const Route = createFileRoute("/")({
   notFoundComponent: HomeNotFoundComponent,
 });
 
+function FilterChip({
+  active,
+  onClick,
+  compact,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  compact?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-full border transition-all duration-300 ${
+        compact
+          ? "px-3 py-2.5 text-[11px] uppercase tracking-[0.18em]"
+          : "px-4 py-2 text-xs uppercase tracking-[0.24em]"
+      } ${
+        active
+          ? "border-wood bg-wood text-wood-foreground shadow-sm"
+          : "border-border/70 bg-background/60 text-muted-foreground hover:-translate-y-0.5 hover:border-wood/60 hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 const PRICE_RANGES = [
   { id: "All", label: "Any price", min: 0, max: Infinity },
   { id: "u25", label: "Under ₹25k", min: 0, max: 25000 },
