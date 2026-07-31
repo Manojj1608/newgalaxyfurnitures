@@ -262,9 +262,19 @@ export const Route = createFileRoute("/")({
   notFoundComponent: HomeNotFoundComponent,
 });
 
+const PRICE_RANGES = [
+  { id: "All", label: "Any price", min: 0, max: Infinity },
+  { id: "u25", label: "Under ₹25k", min: 0, max: 25000 },
+  { id: "25-50", label: "₹25k – ₹50k", min: 25000, max: 50000 },
+  { id: "50-100", label: "₹50k – ₹1L", min: 50000, max: 100000 },
+  { id: "100+", label: "₹1L & above", min: 100000, max: Infinity },
+] as const;
+
 function HomePage() {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
+  const [activePrice, setActivePrice] = useState<string>("All");
+  const [activeMaterial, setActiveMaterial] = useState<string>("All");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
@@ -288,6 +298,19 @@ function HomePage() {
 
   const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
+  const materials = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of products) {
+      const m = (p.material ?? "").trim();
+      if (m) set.add(m);
+    }
+    return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [products]);
+
+  useEffect(() => {
+    if (activeMaterial !== "All" && !materials.includes(activeMaterial)) setActiveMaterial("All");
+  }, [materials, activeMaterial]);
+
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
     return categories.filter((c) => {
@@ -306,25 +329,35 @@ function HomePage() {
 
   const filteredProducts = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const range = PRICE_RANGES.find((r) => r.id === activePrice) ?? PRICE_RANGES[0];
     return products.filter((p) => {
       const matchesFilter = activeFilter === "All" || p.category === activeFilter;
+      const effectivePrice = p.sale_price ?? p.price;
+      const matchesPrice = effectivePrice >= range.min && effectivePrice < range.max;
+      const matchesMaterial =
+        activeMaterial === "All" || (p.material ?? "").trim() === activeMaterial;
       const matchesQuery =
         !q ||
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
         (p.material ?? "").toLowerCase().includes(q) ||
         (p.description ?? "").toLowerCase().includes(q);
-      return matchesFilter && matchesQuery && p.in_stock;
+      return matchesFilter && matchesPrice && matchesMaterial && matchesQuery && p.in_stock;
     });
-  }, [products, query, activeFilter]);
+  }, [products, query, activeFilter, activePrice, activeMaterial]);
 
   const featuredProducts = useMemo(() => products.filter((p) => p.featured && p.in_stock).slice(0, 6), [products]);
 
-  const hasActiveFilters = query.trim() !== "" || activeFilter !== "All";
+  const activeFilterCount =
+    (activeFilter !== "All" ? 1 : 0) + (activePrice !== "All" ? 1 : 0) + (activeMaterial !== "All" ? 1 : 0);
+  const hasActiveFilters = query.trim() !== "" || activeFilterCount > 0;
   const clearFilters = () => {
     setQuery("");
     setActiveFilter("All");
+    setActivePrice("All");
+    setActiveMaterial("All");
   };
+
 
   return (
     <main className="relative overflow-hidden">
