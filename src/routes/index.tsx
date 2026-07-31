@@ -329,18 +329,10 @@ function HomePage() {
 
   const filters = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
-  const materials = useMemo(() => {
-    const set = new Set<string>();
-    for (const p of products) {
-      const m = (p.material ?? "").trim();
-      if (m) set.add(m);
-    }
-    return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
-  }, [products]);
+  const scrollToProducts = () => {
+    requestAnimationFrame(() => productsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
 
-  useEffect(() => {
-    if (activeMaterial !== "All" && !materials.includes(activeMaterial)) setActiveMaterial("All");
-  }, [materials, activeMaterial]);
 
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
