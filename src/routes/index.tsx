@@ -357,28 +357,24 @@ function HomePage() {
       const matchesFilter = activeFilter === "All" || p.category === activeFilter;
       const effectivePrice = p.sale_price ?? p.price;
       const matchesPrice = effectivePrice >= range.min && effectivePrice < range.max;
-      const matchesMaterial =
-        activeMaterial === "All" || (p.material ?? "").trim() === activeMaterial;
       const matchesQuery =
         !q ||
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
         (p.material ?? "").toLowerCase().includes(q) ||
         (p.description ?? "").toLowerCase().includes(q);
-      return matchesFilter && matchesPrice && matchesMaterial && matchesQuery && p.in_stock;
+      return matchesFilter && matchesPrice && matchesQuery && p.in_stock;
     });
-  }, [products, query, activeFilter, activePrice, activeMaterial]);
+  }, [products, query, activeFilter, activePrice]);
 
   const featuredProducts = useMemo(() => products.filter((p) => p.featured && p.in_stock).slice(0, 6), [products]);
 
-  const activeFilterCount =
-    (activeFilter !== "All" ? 1 : 0) + (activePrice !== "All" ? 1 : 0) + (activeMaterial !== "All" ? 1 : 0);
+  const activeFilterCount = (activeFilter !== "All" ? 1 : 0) + (activePrice !== "All" ? 1 : 0);
   const hasActiveFilters = query.trim() !== "" || activeFilterCount > 0;
   const clearFilters = () => {
     setQuery("");
     setActiveFilter("All");
     setActivePrice("All");
-    setActiveMaterial("All");
   };
 
 
