@@ -560,18 +560,6 @@ function HomePage() {
                       ))}
                     </div>
                   </div>
-                  {materials.length > 1 && (
-                    <div className="space-y-2">
-                      <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Material</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {materials.map((m) => (
-                          <FilterChip key={m} active={activeMaterial === m} onClick={() => setActiveMaterial(m)} compact>
-                            {m}
-                          </FilterChip>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-border/60 bg-background p-4">
                   <Button variant="ghost" onClick={clearFilters} disabled={!hasActiveFilters}>
