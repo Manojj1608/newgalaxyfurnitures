@@ -606,16 +606,6 @@ function HomePage() {
                 </FilterChip>
               ))}
             </div>
-            {materials.length > 1 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Material</span>
-                {materials.map((m) => (
-                  <FilterChip key={m} active={activeMaterial === m} onClick={() => setActiveMaterial(m)}>
-                    {m}
-                  </FilterChip>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
