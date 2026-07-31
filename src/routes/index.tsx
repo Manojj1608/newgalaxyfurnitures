@@ -624,9 +624,22 @@ function HomePage() {
           </div>
         ) : (
           <div className="mt-12 grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-            {filteredCategories.map((category) => (
+            {filteredCategories.map((category) => {
+              const count = products.filter((p) => p.category === category.title && p.in_stock).length;
+              return (
               <article
                 key={category.title}
+                role="button"
+                tabIndex={0}
+                aria-label={`Filter products by ${category.title}`}
+                onClick={() => { setActiveFilter(category.title); scrollToProducts(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setActiveFilter(category.title);
+                    scrollToProducts();
+                  }
+                }}
                 className={`luxury-card image-frame group relative cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_44px_90px_-44px_color-mix(in_oklab,var(--color-foreground)_32%,transparent)] ${category.span}`}
               >
                 <div className={`relative w-full overflow-hidden ${category.height}`}>
@@ -637,6 +650,11 @@ function HomePage() {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-black/80" />
+                  {count > 0 && (
+                    <span className="absolute right-4 top-4 rounded-full bg-background/90 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-foreground">
+                      {count} {count === 1 ? "piece" : "pieces"}
+                    </span>
+                  )}
                   <div className="absolute inset-x-0 bottom-0 p-6 text-primary-foreground transition-transform duration-500 group-hover:-translate-y-1 sm:p-8 lg:p-10">
                     <p className="text-[10px] uppercase tracking-[0.34em] opacity-85 sm:text-[11px]">
                       {category.eyebrow}
@@ -663,33 +681,51 @@ function HomePage() {
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
 
         {/* Products from DB (filtered by same search/filter) */}
-        {filteredProducts.length > 0 && (
-          <div className="mt-20">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div className="space-y-2">
-                <p className="section-kicker">Shop products</p>
-                <h3 className="font-display text-3xl text-foreground sm:text-4xl">
-                  {filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"} available
-                </h3>
-              </div>
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  <X className="h-3.5 w-3.5" /> Clear filters
-                </Button>
-              )}
+        <div ref={productsRef} className="mt-20 scroll-mt-28">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="space-y-2">
+              <p className="section-kicker">Shop products</p>
+              <h3 className="font-display text-3xl text-foreground sm:text-4xl">
+                {activeFilter === "All" ? "All pieces" : activeFilter} · {filteredProducts.length}{" "}
+                {filteredProducts.length === 1 ? "piece" : "pieces"}
+              </h3>
             </div>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                <X className="h-3.5 w-3.5" /> Clear filters
+              </Button>
+            )}
+          </div>
+          {filteredProducts.length > 0 ? (
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredProducts.map((p) => (
                 <ProductCardLite key={p.id} product={p} />
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="luxury-card mt-8 p-10 text-center">
+              <p className="font-display text-2xl text-foreground">No pieces match these filters yet.</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Try another category or price range — or message us and we&apos;ll source it for you.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <Button variant="outlineWarm" onClick={clearFilters} disabled={!hasActiveFilters}>
+                  Reset filters
+                </Button>
+                <Button variant="wood" asChild>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noreferrer">Enquire on WhatsApp</a>
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
       </section>
 
       {/* Featured products */}
