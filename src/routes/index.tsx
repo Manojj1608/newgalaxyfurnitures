@@ -305,7 +305,7 @@ function HomePage() {
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [activePrice, setActivePrice] = useState<string>("All");
-  const [activeMaterial, setActiveMaterial] = useState<string>("All");
+  const productsRef = useRef<HTMLDivElement | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
