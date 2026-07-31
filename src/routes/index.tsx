@@ -513,33 +513,53 @@ function HomePage() {
               <SheetTrigger asChild>
                 <Button variant="outlineWarm" size="lg" className="sm:hidden">
                   <Filter className="h-4 w-4" />
-                  Filters{activeFilter !== "All" ? ` · ${activeFilter}` : ""}
+                  Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="rounded-t-3xl">
+              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl">
                 <SheetHeader>
-                  <SheetTitle className="font-display text-2xl">Filter by category</SheetTitle>
+                  <SheetTitle className="font-display text-2xl">Filters</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4 grid grid-cols-2 gap-2 px-4 pb-6">
-                  {filters.map((f) => {
-                    const active = activeFilter === f;
-                    return (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() => { setActiveFilter(f); setMobileFiltersOpen(false); }}
-                        className={`rounded-full border px-3 py-2.5 text-[11px] uppercase tracking-[0.18em] transition-all ${
-                          active ? "border-wood bg-wood text-wood-foreground" : "border-border/70 bg-background/70 text-foreground"
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    );
-                  })}
+                <div className="space-y-6 px-4 pb-6 pt-4">
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Category</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {filters.map((f) => (
+                        <FilterChip key={f} active={activeFilter === f} onClick={() => setActiveFilter(f)} compact>
+                          {f}
+                        </FilterChip>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Price range</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {PRICE_RANGES.map((r) => (
+                        <FilterChip key={r.id} active={activePrice === r.id} onClick={() => setActivePrice(r.id)} compact>
+                          {r.label}
+                        </FilterChip>
+                      ))}
+                    </div>
+                  </div>
+                  {materials.length > 1 && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Material</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {materials.map((m) => (
+                          <FilterChip key={m} active={activeMaterial === m} onClick={() => setActiveMaterial(m)} compact>
+                            {m}
+                          </FilterChip>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="border-t border-border/60 p-4">
-                  <Button variant="ghost" className="w-full" onClick={() => { clearFilters(); setMobileFiltersOpen(false); }} disabled={!hasActiveFilters}>
-                    <X className="h-4 w-4" /> Clear filters
+                <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-border/60 bg-background p-4">
+                  <Button variant="ghost" onClick={clearFilters} disabled={!hasActiveFilters}>
+                    <X className="h-4 w-4" /> Clear
+                  </Button>
+                  <Button variant="wood" onClick={() => setMobileFiltersOpen(false)}>
+                    Show {filteredProducts.length} pieces
                   </Button>
                 </div>
               </SheetContent>
@@ -550,27 +570,36 @@ function HomePage() {
               </Button>
             )}
           </div>
-          <div className="hidden flex-wrap gap-2 sm:flex">
-            {filters.map((f) => {
-              const active = activeFilter === f;
-              return (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setActiveFilter(f)}
-                  className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.24em] transition-all duration-300 ${
-                    active
-                      ? "border-wood bg-wood text-wood-foreground shadow-sm"
-                      : "border-border/70 bg-background/60 text-muted-foreground hover:-translate-y-0.5 hover:border-wood/60 hover:text-foreground"
-                  }`}
-                  aria-pressed={active}
-                >
+          <div className="hidden flex-col gap-3 sm:flex">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Category</span>
+              {filters.map((f) => (
+                <FilterChip key={f} active={activeFilter === f} onClick={() => setActiveFilter(f)}>
                   {f}
-                </button>
-              );
-            })}
+                </FilterChip>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Price</span>
+              {PRICE_RANGES.map((r) => (
+                <FilterChip key={r.id} active={activePrice === r.id} onClick={() => setActivePrice(r.id)}>
+                  {r.label}
+                </FilterChip>
+              ))}
+            </div>
+            {materials.length > 1 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="mr-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Material</span>
+                {materials.map((m) => (
+                  <FilterChip key={m} active={activeMaterial === m} onClick={() => setActiveMaterial(m)}>
+                    {m}
+                  </FilterChip>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
 
         {filteredCategories.length === 0 ? (
           <div className="luxury-card mt-12 p-10 text-center">
