@@ -1,49 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-import { fetchProducts } from "@/lib/shopify";
-
-const BASE_URL = "";
-
-interface SitemapEntry {
-  path: string;
-  lastmod?: string;
-  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
-  priority?: string;
-}
+import { createClient } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: async () => {
-        const products = await fetchProducts({ first: 50 });
+      GET: async ({ request }) => {
+        const origin = new URL(request.url).origin;
 
-        const entries: SitemapEntry[] = [
-          { path: "/", changefreq: "weekly", priority: "1.0" },
-          ...products.map((product) => ({
-            path: `/product/${product.handle}`,
-            changefreq: "weekly" as const,
+        const supabase = createClient(
+          process.env["VITE_SUPABASE_URL"] ?? import.meta.env.VITE_SUPABASE_URL,
+          process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ??
+            import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          { auth: { persistSession: false } },
+        );
+
+        const { data } = await supabase
+          .from("products")
+          .select("slug, updated_at")
+          .eq("status", "active")
+          .is("deleted_at", null)
+          .order("updated_at", { ascending: false })
+          .limit(1000);
+
+        const entries = [
+          { path: "/", changefreq: "daily", priority: "1.0", lastmod: undefined as string | undefined },
+          ...(data ?? []).map((p) => ({
+            path: `/product/${p.slug}`,
+            changefreq: "weekly",
             priority: "0.8",
+            lastmod: p.updated_at,
           })),
         ];
-
-        const urls = entries.map((entry) =>
-          [
-            "  <url>",
-            `    <loc>${BASE_URL}${entry.path}</loc>`,
-            entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>` : null,
-            entry.changefreq ? `    <changefreq>${entry.changefreq}</changefreq>` : null,
-            entry.priority ? `    <priority>${entry.priority}</priority>` : null,
-            "  </url>",
-          ]
-            .filter(Boolean)
-            .join("\n"),
-        );
 
         const xml = [
           '<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-          ...urls,
+          ...entries.map((entry) =>
+            [
+              "  <url>",
+              `    <loc>${origin}${entry.path}</loc>`,
+              entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>` : null,
+              `    <changefreq>${entry.changefreq}</changefreq>`,
+              `    <priority>${entry.priority}</priority>`,
+              "  </url>",
+            ]
+              .filter(Boolean)
+              .join("\n"),
+          ),
           "</urlset>",
         ].join("\n");
 

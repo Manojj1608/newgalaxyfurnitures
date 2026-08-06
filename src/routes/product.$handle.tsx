@@ -1,220 +1,278 @@
-import { useEffect, useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, MessageCircle, Star } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Check, MessageCircle, Share2, Truck } from "lucide-react";
 
+import { ProductCard } from "@/components/site/product-card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { fetchProductBySlug } from "@/lib/products-api";
-import { formatINR, type Product } from "@/lib/products-config";
-import { supabase } from "@/integrations/supabase/client";
-
-const PHONE_DIGITS = "919513443606";
-
-function ProductNotFoundComponent() {
-  return (
-    <div className="page-shell flex min-h-screen items-center justify-center py-16">
-      <div className="luxury-card max-w-xl p-8 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Product not found</p>
-        <h1 className="mt-4 font-display text-5xl text-foreground">That piece isn&apos;t in the catalog</h1>
-        <div className="mt-8">
-          <Button variant="wood" asChild>
-            <Link to="/">Back to home</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ProductErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  return (
-    <div className="page-shell flex min-h-screen items-center justify-center py-16">
-      <div className="luxury-card max-w-xl p-8 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Unable to load</p>
-        <h1 className="mt-4 font-display text-5xl text-foreground">This product couldn&apos;t be loaded</h1>
-        <p className="mt-4 text-sm leading-7 text-muted-foreground">{error.message}</p>
-        <div className="mt-8">
-          <Button variant="wood" onClick={reset}>Try again</Button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import {
+  contentKeys,
+  productQuery,
+  useContentRealtime,
+  useProducts,
+  useSettings,
+} from "@/hooks/use-content";
+import { logProductView } from "@/lib/content-api";
+import {
+  discountPercent,
+  effectivePrice,
+  formatINR,
+  PLACEHOLDER_IMAGE,
+  type Product,
+} from "@/lib/content-types";
+import { openProductEnquiry } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/product/$handle")({
-  loader: async ({ params }) => {
-    const product = await fetchProductBySlug(params.handle);
-    if (!product) throw notFound();
-    return product;
-  },
-  head: ({ loaderData }) => {
-    const title = loaderData?.name ?? "Product";
-    const description =
-      loaderData?.description ||
-      `Discover ${title} at New Galaxy Furniture — premium furniture crafted in Bengaluru since 2002.`;
-    return {
-      meta: [
-        { title: `${title} | New Galaxy Furniture` },
-        { name: "description", content: description },
-        { property: "og:title", content: `${title} | New Galaxy Furniture` },
-        { property: "og:description", content: description },
-        { property: "og:type", content: "product" },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
-    };
-  },
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.handle.replace(/-/g, " ")} | New Galaxy Furniture` },
+      {
+        name: "description",
+        content:
+          "Premium furniture handcrafted in Bengaluru by New Galaxy Furniture. View details, materials, dimensions and enquire on WhatsApp.",
+      },
+      { property: "og:type", content: "product" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: `${params.handle.replace(/-/g, " ")} | New Galaxy Furniture` },
+      {
+        property: "og:description",
+        content: "Handcrafted premium furniture from New Galaxy Furniture, Bengaluru.",
+      },
+    ],
+  }),
   component: ProductPage,
-  errorComponent: ProductErrorComponent,
-  notFoundComponent: ProductNotFoundComponent,
 });
 
-function ProductPage() {
-  const initial = Route.useLoaderData();
-  const { handle } = Route.useParams();
-  const [product, setProduct] = useState<Product>(initial);
-  const [activeImage, setActiveImage] = useState(0);
-
-  // Live-refresh on admin edits.
-  useEffect(() => {
-    const channel = supabase
-      .channel(`product:${handle}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "products", filter: `slug=eq.${handle}` },
-        () => {
-          fetchProductBySlug(handle).then((p) => p && setProduct(p)).catch(() => {});
-        },
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [handle]);
-
-  const onSale = product.sale_price != null && Number(product.sale_price) < Number(product.price);
-  const images = product.images ?? [];
-  const enquireMessage = encodeURIComponent(
-    `Hello, I'm interested in ${product.name} (${product.category}). Could you share availability and delivery details?`,
+function Spec({ label, value }: { label: string; value?: string | null }) {
+  if (!value) return null;
+  return (
+    <div className="border-b border-border py-3">
+      <dt className="text-[0.65rem] uppercase tracking-[0.24em] text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-sm text-foreground">{value}</dd>
+    </div>
   );
-  const whatsappUrl = `https://wa.me/${PHONE_DIGITS}?text=${enquireMessage}`;
+}
+
+function ProductPage() {
+  const { handle } = useParams({ from: "/product/$handle" });
+  useContentRealtime();
+
+  const { data: product, isLoading } = useQuery({
+    ...productQuery(handle),
+    queryKey: contentKeys.product(handle),
+  });
+  const { data: allProducts = [] } = useProducts();
+  const { data: settings = null } = useSettings();
+  const whatsapp = settings?.whatsapp ?? "919513443606";
+
+  const [active, setActive] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (product?.id) void logProductView(product.id);
+  }, [product?.id]);
+
+  useEffect(() => setActive(0), [handle]);
+
+  const related = useMemo(() => {
+    if (!product) return [] as Product[];
+    const others = allProducts.filter((p) => p.id !== product.id);
+    const score = (p: Product) =>
+      (p.category_id && p.category_id === product.category_id ? 4 : 0) +
+      (p.category === product.category ? 2 : 0) +
+      (p.material && p.material === product.material ? 1 : 0);
+    return [...others]
+      .sort(
+        (a, b) =>
+          score(b) - score(a) ||
+          Math.abs(effectivePrice(a) - effectivePrice(product)) -
+            Math.abs(effectivePrice(b) - effectivePrice(product)),
+      )
+      .slice(0, 3);
+  }, [allProducts, product]);
+
+  if (isLoading) {
+    return (
+      <main className="page-shell py-32">
+        <div className="h-[26rem] animate-pulse rounded-3xl bg-muted" />
+      </main>
+    );
+  }
+
+  if (!product) {
+    return (
+      <main className="page-shell flex min-h-[70vh] flex-col items-center justify-center text-center">
+        <h1 className="font-display text-4xl text-foreground">Piece not found</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          This product may have been removed from the showroom.
+        </p>
+        <Button asChild variant="luxury" className="mt-8 rounded-full">
+          <Link to="/">Back to collection</Link>
+        </Button>
+      </main>
+    );
+  }
+
+  const images = product.images.length > 0 ? product.images : [{ url: PLACEHOLDER_IMAGE, path: "" }];
+  const discount = discountPercent(product);
+
+  const share = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: product.name, url });
+        return;
+      } catch {
+        /* fall through to copy */
+      }
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <main className="page-shell py-6 sm:py-8">
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-full border border-border/70 bg-background/85 px-4 py-3 shadow-sm backdrop-blur-xl sm:px-6">
-        <div className="flex min-w-0 items-center gap-4">
-          <Button variant="outlineWarm" size="icon" asChild>
-            <Link to="/" aria-label="Back to home">
-              <ArrowLeft />
-            </Link>
-          </Button>
-          <div className="min-w-0">
-            <p className="truncate font-display text-3xl text-foreground">New Galaxy Furniture</p>
-            <p className="truncate text-xs uppercase tracking-[0.28em] text-muted-foreground">
-              Product detail
-            </p>
-          </div>
-        </div>
-        <Button asChild variant="wood" size="sm">
-          <a href={whatsappUrl} target="_blank" rel="noreferrer">
-            <MessageCircle className="h-4 w-4" /> WhatsApp
-          </a>
-        </Button>
-      </header>
+    <main className="pb-28 pt-28 lg:pb-24">
+      <div className="page-shell">
+        <nav className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <Link to="/" className="inline-flex items-center gap-1 hover:text-foreground">
+            <ArrowLeft className="h-3.5 w-3.5" /> Collection
+          </Link>
+          <span>/</span>
+          <span className="text-foreground">{product.category}</span>
+        </nav>
 
-      <section className="section-shell">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">
-          <div className="space-y-4">
-            <div className="luxury-card image-frame overflow-hidden">
-              {images[activeImage] ? (
-                <img
-                  src={images[activeImage].url}
-                  alt={product.name}
-                  className="h-full min-h-[28rem] w-full object-cover"
-                  width={1536}
-                  height={1024}
-                />
-              ) : (
-                <div className="grid min-h-[28rem] place-items-center bg-secondary/45 text-muted-foreground">
-                  Product imagery coming soon
-                </div>
-              )}
+        <div className="mt-8 grid gap-12 lg:grid-cols-2">
+          <div>
+            <div className="image-frame overflow-hidden rounded-3xl">
+              <img
+                src={images[Math.min(active, images.length - 1)]!.url}
+                alt={product.name}
+                className="aspect-4/5 w-full object-cover transition-transform duration-700 hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.src = PLACEHOLDER_IMAGE;
+                }}
+              />
             </div>
-            {images.length > 1 && (
-              <div className="flex flex-wrap gap-3">
+            {images.length > 1 ? (
+              <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
                 {images.map((img, i) => (
                   <button
-                    key={img.path}
-                    onClick={() => setActiveImage(i)}
-                    className={`h-20 w-20 overflow-hidden rounded-lg border transition ${
-                      i === activeImage ? "border-wood ring-2 ring-wood/40" : "border-border/60 hover:border-wood/60"
-                    }`}
+                    key={img.url + i}
+                    type="button"
+                    onClick={() => setActive(i)}
                     aria-label={`View image ${i + 1}`}
+                    className={`h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-colors ${
+                      i === active ? "border-wood" : "border-transparent"
+                    }`}
                   >
                     <img src={img.url} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
 
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="section-kicker">{product.category}</p>
-              {product.featured && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-wood/95 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-wood-foreground">
-                  <Star className="h-3 w-3 fill-current" /> Featured
-                </span>
-              )}
-              {!product.in_stock && (
-                <span className="rounded-full bg-muted px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-                  Out of stock
-                </span>
-              )}
+          <div>
+            <div className="flex flex-wrap gap-2">
+              {product.new_arrival ? <Badge variant="secondary">New</Badge> : null}
+              {product.bestseller ? <Badge variant="secondary">Bestseller</Badge> : null}
+              {discount ? <Badge>{discount}% off</Badge> : null}
             </div>
-            <h1 className="section-title">{product.name}</h1>
-            <div>
-              <p className="font-display text-4xl text-foreground">
-                {formatINR(Number(onSale ? product.sale_price! : product.price))}
+
+            <h1 className="mt-4 font-display text-[clamp(2.2rem,4vw,3.2rem)] leading-tight text-foreground">
+              {product.name}
+            </h1>
+
+            <div className="mt-5 flex items-baseline gap-3">
+              <span className="text-2xl font-semibold text-foreground">
+                {formatINR(effectivePrice(product))}
+              </span>
+              {discount ? (
+                <span className="text-base text-muted-foreground line-through">
+                  {formatINR(product.price)}
+                </span>
+              ) : null}
+            </div>
+
+            <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {product.in_stock ? "In stock — ready to deliver" : "Made to order"}
+            </p>
+
+            {product.short_description || product.description ? (
+              <p className="mt-6 text-sm leading-8 text-muted-foreground">
+                {product.short_description ?? product.description}
               </p>
-              {onSale && (
-                <p className="text-sm text-muted-foreground line-through">
-                  {formatINR(Number(product.price))}
-                </p>
-              )}
-            </div>
-            {product.description && (
-              <p className="section-copy whitespace-pre-line">{product.description}</p>
-            )}
+            ) : null}
 
-            {(product.material || product.dimensions) && (
-              <div className="luxury-card grid gap-4 p-6 sm:grid-cols-2">
-                {product.material && (
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Material</p>
-                    <p className="mt-2 text-sm leading-6 text-foreground">{product.material}</p>
-                  </div>
-                )}
-                {product.dimensions && (
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Dimensions</p>
-                    <p className="mt-2 text-sm leading-6 text-foreground">{product.dimensions}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-3">
-              <Button variant="wood" size="lg" asChild>
-                <a href={whatsappUrl} target="_blank" rel="noreferrer">
-                  <MessageCircle className="h-4 w-4" /> Enquire on WhatsApp
-                </a>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                variant="luxury"
+                className="rounded-full px-8"
+                onClick={() => void openProductEnquiry(product, whatsapp, "product-page")}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" /> Enquire on WhatsApp
               </Button>
-              <Button variant="outlineWarm" size="lg" asChild>
-                <Link to="/">Continue browsing</Link>
+              <Button variant="outline" className="rounded-full" onClick={() => void share()}>
+                {copied ? <Check className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
+                {copied ? "Link copied" : "Share"}
               </Button>
             </div>
+
+            <dl className="mt-10">
+              <Spec label="SKU" value={product.sku ?? product.product_code} />
+              <Spec label="Material" value={product.material} />
+              <Spec label="Finish" value={product.finish} />
+              <Spec label="Colour" value={product.color} />
+              <Spec label="Dimensions" value={product.dimensions ?? product.size} />
+              <Spec label="Weight" value={product.weight} />
+              <Spec label="Style" value={product.style} />
+              <Spec label="Warranty" value={product.warranty} />
+            </dl>
+
+            {product.delivery_info ? (
+              <p className="mt-6 flex items-start gap-3 text-sm leading-7 text-muted-foreground">
+                <Truck className="mt-1 h-4 w-4 shrink-0 text-wood" />
+                {product.delivery_info}
+              </p>
+            ) : null}
+
+            {product.description && product.short_description ? (
+              <p className="mt-8 text-sm leading-8 text-muted-foreground">{product.description}</p>
+            ) : null}
           </div>
         </div>
-      </section>
+
+        {related.length > 0 ? (
+          <section className="mt-24">
+            <h2 className="section-title">You may also like</h2>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} whatsapp={whatsapp} sourcePage="product-page" />
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-4 border-t border-border bg-background/95 px-5 py-3 backdrop-blur lg:hidden">
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            {formatINR(effectivePrice(product))}
+          </p>
+          <p className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+            {product.in_stock ? "In stock" : "Made to order"}
+          </p>
+        </div>
+        <Button
+          variant="luxury"
+          className="rounded-full"
+          onClick={() => void openProductEnquiry(product, whatsapp, "product-page-mobile")}
+        >
+          <MessageCircle className="mr-2 h-4 w-4" /> Enquire
+        </Button>
+      </div>
     </main>
   );
 }
