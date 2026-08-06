@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
-import { useCartSync } from "@/hooks/use-cart-sync";
+
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import appCss from "../styles.css?url";
 
@@ -128,7 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  useCartSync();
+  
 
   return (
     <QueryClientProvider client={queryClient}>
