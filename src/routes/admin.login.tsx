@@ -9,6 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/admin/login")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//") ? s.next : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Admin Sign In | New Galaxy Furniture" },
@@ -29,16 +32,19 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLoginPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // If already signed in, jump straight to the dashboard.
+  // If already signed in, jump straight to the intended destination.
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/admin/dashboard", replace: true });
+      if (!data.user) return;
+      if (next) window.location.replace(next);
+      else navigate({ to: "/admin/dashboard", replace: true });
     });
-  }, [navigate]);
+  }, [navigate, next]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,13 +53,15 @@ function AdminLoginPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("Signed in");
-      navigate({ to: "/admin/dashboard" });
+      if (next) window.location.assign(next);
+      else navigate({ to: "/admin/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
       setLoading(false);
     }
   }
+
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
