@@ -104,7 +104,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Trusted Bengaluru furniture house since 2002 — premium sofas, beds, dining tables, custom pieces, reliable delivery.",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+    ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,

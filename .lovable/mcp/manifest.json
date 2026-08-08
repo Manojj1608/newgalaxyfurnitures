@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://rtkqaoidtgdvacqigesq.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "new-galaxy-furniture",
+      "version": "0.1.0",
+      "title": "New Galaxy Furniture"
+    },
+    "tools": [
+      {
+        "name": "search_products",
+        "title": "Search products",
+        "description": "Search the New Galaxy Furniture catalogue by name, category, or status. Returns matching products with price and stock.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Text to match against product name or description.",
+              "type": "string"
+            },
+            "category": {
+              "description": "Filter by category name, e.g. 'Sofas & Sectionals'.",
+              "type": "string"
+            },
+            "status": {
+              "description": "Publication status filter. Defaults to active.",
+              "type": "string",
+              "enum": [
+                "active",
+                "draft",
+                "any"
+              ]
+            },
+            "limit": {
+              "description": "Max results (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_product",
+        "title": "Get product",
+        "description": "Fetch the full details of a single product by its slug or id.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "description": "Product slug, e.g. 'walnut-lounge-sofa'.",
+              "type": "string"
+            },
+            "id": {
+              "description": "Product id (uuid).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_product",
+        "title": "Create product",
+        "description": "Add a new furniture product to the catalogue. Requires an admin account; the product appears on the storefront when status is active.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Product name."
+            },
+            "category": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Category name, e.g. 'Dining Tables'."
+            },
+            "price": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Price in INR."
+            },
+            "description": {
+              "type": "string"
+            },
+            "material": {
+              "type": "string"
+            },
+            "dimensions": {
+              "type": "string"
+            },
+            "status": {
+              "description": "Defaults to draft.",
+              "type": "string",
+              "enum": [
+                "active",
+                "draft"
+              ]
+            },
+            "featured": {
+              "description": "Show in the homepage featured grid.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name",
+            "category",
+            "price"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_product",
+        "title": "Update product",
+        "description": "Update an existing product's price, stock, status, or featured flag. Requires an admin account.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Product id to update."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "sale_price": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "description": {
+              "type": "string"
+            },
+            "category": {
+              "type": "string"
+            },
+            "stock_quantity": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "in_stock": {
+              "type": "boolean"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "active",
+                "draft"
+              ]
+            },
+            "featured": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_enquiries",
+        "title": "List customer enquiries",
+        "description": "List recent customer enquiries with status and the product enquired about. Requires an admin account.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter by status, e.g. 'new', 'contacted', 'closed'.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max results (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
