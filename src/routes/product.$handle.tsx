@@ -145,16 +145,14 @@ function ProductPage() {
 
         <div className="mt-8 grid gap-12 lg:grid-cols-2">
           <div>
-            <div className="image-frame product-media aspect-4/5 overflow-hidden rounded-3xl">
-              <img
-                src={images[Math.min(active, images.length - 1)]!.url}
-                alt={product.name}
-                className="product-media-img transition-transform duration-700 hover:scale-105"
-                onError={(e) => {
-                  e.currentTarget.src = PLACEHOLDER_IMAGE;
-                }}
-              />
-            </div>
+            <AdaptiveImage
+              key={images[Math.min(active, images.length - 1)]!.url}
+              src={images[Math.min(active, images.length - 1)]!.url}
+              alt={product.name}
+              className="image-frame overflow-hidden rounded-3xl"
+              imgClassName="transition-transform duration-700 hover:scale-105"
+            />
+
             {images.length > 1 ? (
               <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
                 {images.map((img, i) => (
