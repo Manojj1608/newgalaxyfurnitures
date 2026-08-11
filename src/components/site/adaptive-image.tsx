@@ -36,6 +36,11 @@ export function AdaptiveImage({
         src={src}
         alt={alt}
         decoding="async"
+        ref={(el) => {
+          if (el?.complete && el.naturalWidth && el.naturalHeight) {
+            setRatio(el.naturalWidth / el.naturalHeight);
+          }
+        }}
         onLoad={(e) => {
           const el = e.currentTarget;
           if (el.naturalWidth && el.naturalHeight) {
