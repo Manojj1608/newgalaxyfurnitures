@@ -33,12 +33,19 @@ export function ProductCard({
         className="block"
         aria-label={product.name}
       >
-        <div className="image-frame product-media relative aspect-4/5 overflow-hidden">
+        <div
+          className="image-frame product-media relative overflow-hidden"
+          style={{ aspectRatio: String(ratio) }}
+        >
           <img
             src={image}
             alt={product.name}
             loading="lazy"
             decoding="async"
+            ref={(el) => {
+              if (el?.complete) measure(el);
+            }}
+            onLoad={(e) => measure(e.currentTarget)}
             onError={(e) => {
               e.currentTarget.src = PLACEHOLDER_IMAGE;
             }}
@@ -53,6 +60,7 @@ export function ProductCard({
               className="product-media-img absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
             />
           ) : null}
+
 
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
             {product.new_arrival ? <Badge variant="secondary">New</Badge> : null}
