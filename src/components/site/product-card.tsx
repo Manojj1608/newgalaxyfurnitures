@@ -33,7 +33,7 @@ export function ProductCard({
         className="block"
         aria-label={product.name}
       >
-        <div className="image-frame relative aspect-4/5 overflow-hidden">
+        <div className="image-frame product-media relative aspect-4/5 overflow-hidden">
           <img
             src={image}
             alt={product.name}
@@ -42,7 +42,7 @@ export function ProductCard({
             onError={(e) => {
               e.currentTarget.src = PLACEHOLDER_IMAGE;
             }}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="product-media-img transition-transform duration-700 group-hover:scale-105"
           />
           {hover ? (
             <img
@@ -50,9 +50,10 @@ export function ProductCard({
               alt=""
               aria-hidden
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className="product-media-img absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
             />
           ) : null}
+
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
             {product.new_arrival ? <Badge variant="secondary">New</Badge> : null}
             {product.bestseller ? <Badge variant="secondary">Bestseller</Badge> : null}
