@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, MessageCircle, Share2, Truck } from "lucide-react";
 
 import { ProductCard } from "@/components/site/product-card";
+import { AdaptiveImage } from "@/components/site/adaptive-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
