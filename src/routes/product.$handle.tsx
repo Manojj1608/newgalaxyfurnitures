@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, MessageCircle, Share2, Truck } from "lucide-react";
 
 import { ProductCard } from "@/components/site/product-card";
+import { AdaptiveImage } from "@/components/site/adaptive-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -145,16 +146,14 @@ function ProductPage() {
 
         <div className="mt-8 grid gap-12 lg:grid-cols-2">
           <div>
-            <div className="image-frame overflow-hidden rounded-3xl">
-              <img
-                src={images[Math.min(active, images.length - 1)]!.url}
-                alt={product.name}
-                className="aspect-4/5 w-full object-cover transition-transform duration-700 hover:scale-105"
-                onError={(e) => {
-                  e.currentTarget.src = PLACEHOLDER_IMAGE;
-                }}
-              />
-            </div>
+            <AdaptiveImage
+              key={images[Math.min(active, images.length - 1)]!.url}
+              src={images[Math.min(active, images.length - 1)]!.url}
+              alt={product.name}
+              className="image-frame overflow-hidden rounded-3xl"
+              imgClassName="transition-transform duration-700 hover:scale-105"
+            />
+
             {images.length > 1 ? (
               <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
                 {images.map((img, i) => (
@@ -167,7 +166,7 @@ function ProductPage() {
                       i === active ? "border-wood" : "border-transparent"
                     }`}
                   >
-                    <img src={img.url} alt="" className="h-full w-full object-cover" />
+                    <img src={img.url} alt="" className="product-media-img" />
                   </button>
                 ))}
               </div>

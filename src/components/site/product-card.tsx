@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Eye, MessageCircle } from "lucide-react";
 
@@ -24,6 +25,14 @@ export function ProductCard({
   const discount = discountPercent(product);
   const image = primaryImage(product);
   const hover = product.hover_image_url ?? product.images[1]?.url ?? null;
+  // Card frames adapt to the uploaded image ratio (clamped) so nothing is
+  // stretched or cropped while the grid stays visually consistent.
+  const [natural, setNatural] = useState<number | null>(null);
+  const ratio = Math.min(1.25, Math.max(0.8, natural ?? 1));
+  const measure = (el: HTMLImageElement) => {
+    if (el.naturalWidth && el.naturalHeight) setNatural(el.naturalWidth / el.naturalHeight);
+  };
+
 
   return (
     <article className="group luxury-card overflow-hidden">
@@ -33,16 +42,23 @@ export function ProductCard({
         className="block"
         aria-label={product.name}
       >
-        <div className="image-frame relative aspect-4/5 overflow-hidden">
+        <div
+          className="image-frame product-media relative overflow-hidden"
+          style={{ aspectRatio: String(ratio) }}
+        >
           <img
             src={image}
             alt={product.name}
             loading="lazy"
             decoding="async"
+            ref={(el) => {
+              if (el?.complete) measure(el);
+            }}
+            onLoad={(e) => measure(e.currentTarget)}
             onError={(e) => {
               e.currentTarget.src = PLACEHOLDER_IMAGE;
             }}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="product-media-img transition-transform duration-700 group-hover:scale-105"
           />
           {hover ? (
             <img
@@ -50,9 +66,11 @@ export function ProductCard({
               alt=""
               aria-hidden
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className="product-media-img absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
             />
           ) : null}
+
+
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
             {product.new_arrival ? <Badge variant="secondary">New</Badge> : null}
             {product.bestseller ? <Badge variant="secondary">Bestseller</Badge> : null}
