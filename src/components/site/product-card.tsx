@@ -24,6 +24,14 @@ export function ProductCard({
   const discount = discountPercent(product);
   const image = primaryImage(product);
   const hover = product.hover_image_url ?? product.images[1]?.url ?? null;
+  // Card frames adapt to the uploaded image ratio (clamped) so nothing is
+  // stretched or cropped while the grid stays visually consistent.
+  const [natural, setNatural] = useState<number | null>(null);
+  const ratio = Math.min(1.25, Math.max(0.8, natural ?? 1));
+  const measure = (el: HTMLImageElement) => {
+    if (el.naturalWidth && el.naturalHeight) setNatural(el.naturalWidth / el.naturalHeight);
+  };
+
 
   return (
     <article className="group luxury-card overflow-hidden">
