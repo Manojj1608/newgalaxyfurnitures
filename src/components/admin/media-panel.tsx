@@ -85,7 +85,7 @@ export function MediaPanel() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
           {media.map((m) => (
             <div key={m.id} className="group relative overflow-hidden rounded-xl border border-border/60">
-              <img src={m.url} alt={m.alt ?? ""} className="aspect-square w-full object-cover" />
+              <img src={m.url} alt={m.alt ?? ""} className="product-media product-media-img aspect-square w-full" />
               <div className="absolute inset-x-0 bottom-0 flex justify-between bg-background/85 p-1 opacity-0 transition-opacity group-hover:opacity-100">
                 <button
                   type="button"

@@ -145,11 +145,11 @@ function ProductPage() {
 
         <div className="mt-8 grid gap-12 lg:grid-cols-2">
           <div>
-            <div className="image-frame overflow-hidden rounded-3xl">
+            <div className="image-frame product-media aspect-4/5 overflow-hidden rounded-3xl">
               <img
                 src={images[Math.min(active, images.length - 1)]!.url}
                 alt={product.name}
-                className="aspect-4/5 w-full object-cover transition-transform duration-700 hover:scale-105"
+                className="product-media-img transition-transform duration-700 hover:scale-105"
                 onError={(e) => {
                   e.currentTarget.src = PLACEHOLDER_IMAGE;
                 }}
@@ -167,7 +167,7 @@ function ProductPage() {
                       i === active ? "border-wood" : "border-transparent"
                     }`}
                   >
-                    <img src={img.url} alt="" className="h-full w-full object-cover" />
+                    <img src={img.url} alt="" className="product-media-img" />
                   </button>
                 ))}
               </div>

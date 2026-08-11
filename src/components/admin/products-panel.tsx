@@ -384,7 +384,7 @@ export function ProductsPanel() {
                       <TableRow key={p.id}>
                         <TableCell>
                           {p.images[0] ? (
-                            <img src={p.images[0].url} alt="" className="h-12 w-12 rounded-md object-cover" />
+                            <img src={p.images[0].url} alt="" className="product-media product-media-img h-12 w-12 rounded-md" />
                           ) : (
                             <div className="grid h-12 w-12 place-content-center rounded-md bg-muted text-muted-foreground">
                               <ImageIcon className="h-4 w-4" />
@@ -861,7 +861,7 @@ function ProductDialog({
                       idx === 0 ? "border-wood ring-2 ring-wood/30" : "border-border/60"
                     }`}
                   >
-                    <img src={img.url} alt="" className="aspect-square w-full object-cover" />
+                    <img src={img.url} alt="" className="product-media product-media-img aspect-4/5 w-full" />
                     <span className="absolute left-1 top-1 rounded-full bg-background/85 px-2 py-0.5 text-[10px] uppercase tracking-wider">
                       <GripVertical className="inline h-3 w-3" /> Drag
                     </span>

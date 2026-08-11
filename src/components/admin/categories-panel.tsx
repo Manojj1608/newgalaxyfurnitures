@@ -151,7 +151,7 @@ export function CategoriesPanel() {
               <div key={c.id} className="rounded-2xl border border-border/60 bg-background/60 p-4">
                 <div className="flex flex-wrap items-center gap-3">
                   {c.thumbnail_url ? (
-                    <img src={c.thumbnail_url} alt="" className="h-12 w-12 rounded-lg object-cover" />
+                    <img src={c.thumbnail_url} alt="" className="product-media product-media-img h-12 w-12 rounded-lg" />
                   ) : (
                     <div className="h-12 w-12 rounded-lg bg-muted" />
                   )}
