@@ -24,7 +24,7 @@ export function HeroSlider({ banners }: { banners: HeroBanner[] }) {
           alt={b.title}
           fetchPriority={i === 0 ? "high" : "low"}
           loading={i === 0 ? "eager" : "lazy"}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+          className={`absolute inset-0 h-full w-full object-cover object-[38%_center] transition-opacity duration-1000 ${
             i === index ? "opacity-100" : "opacity-0"
           }`}
         />
