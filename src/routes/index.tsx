@@ -49,8 +49,10 @@ export const Route = createFileRoute("/")({
           url: "https://newgalaxyfurnitures.lovable.app",
           address: {
             "@type": "PostalAddress",
+            streetAddress: "1, Thubarahalli, Varthur Main Road, next to ICICI Bank, Whitefield",
             addressLocality: "Bengaluru",
             addressRegion: "Karnataka",
+            postalCode: "560066",
             addressCountry: "IN",
           },
           openingHours: "Mo-Sa 10:00-20:00",
