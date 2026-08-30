@@ -133,14 +133,14 @@
 }
 
 @utility section-shell {
-  padding-block: 4.5rem;
+  padding-block: 3rem;
 
   @media (width >= 48rem) {
-    padding-block: 6rem;
+    padding-block: 3.75rem;
   }
 
   @media (width >= 80rem) {
-    padding-block: 7.5rem;
+    padding-block: 4.5rem;
   }
 }
 
@@ -153,8 +153,8 @@
 
 @utility section-title {
   font-family: var(--font-display-family);
-  font-size: clamp(2.6rem, 6vw, 4.8rem);
-  line-height: 0.95;
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  line-height: 1.02;
   color: var(--color-foreground);
 }
 
@@ -220,8 +220,18 @@
 
 @utility hero-scrim {
   background:
-    linear-gradient(90deg, color-mix(in oklab, var(--color-background) 75%, transparent), transparent 55%),
-    linear-gradient(180deg, transparent 45%, color-mix(in oklab, var(--hero-scrim) 100%, transparent));
+    linear-gradient(180deg, oklch(0.2 0.02 48 / 0.32) 0%, transparent 28%),
+    linear-gradient(180deg, transparent 40%, oklch(0.18 0.02 48 / 0.14) 100%);
+}
+
+/* Localized readability gradient sitting only behind the hero copy. */
+@utility hero-text-veil {
+  background: radial-gradient(
+    120% 130% at 12% 88%,
+    oklch(0.16 0.02 48 / 0.78) 0%,
+    oklch(0.16 0.02 48 / 0.55) 38%,
+    transparent 72%
+  );
 }
 
 @utility story-link {
