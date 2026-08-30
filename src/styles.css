@@ -133,14 +133,14 @@
 }
 
 @utility section-shell {
-  padding-block: 4.5rem;
+  padding-block: 3rem;
 
   @media (width >= 48rem) {
-    padding-block: 6rem;
+    padding-block: 3.75rem;
   }
 
   @media (width >= 80rem) {
-    padding-block: 7.5rem;
+    padding-block: 4.5rem;
   }
 }
 
