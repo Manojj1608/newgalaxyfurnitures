@@ -15,35 +15,40 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { deleteProductImage, logAudit, uploadProductImage } from "@/lib/content-api";
+import { logAudit } from "@/lib/content-api";
 import type { MediaRow } from "@/lib/content-types";
 import { mediaQuery, useMedia } from "@/hooks/use-admin-data";
+import { useImageUpload } from "@/hooks/use-image-upload";
+import { summarise as summariseUploads } from "@/lib/uploads";
+import { copyToClipboard } from "@/lib/clipboard";
+import { queryStateOf } from "@/lib/query-state";
+import { QueryFailed } from "@/components/site/query-state";
 
 export function MediaPanel() {
   const queryClient = useQueryClient();
-  const { data: media = [], isLoading } = useMedia();
-  const [uploading, setUploading] = useState(false);
+  // 1.23: isError was never read, so a failed query rendered as an empty library.
+  const { data: media = [], isLoading, isError, refetch } = useMedia();
+  const { uploading, uploadMany, removeOne } = useImageUpload();
   const [confirm, setConfirm] = useState<MediaRow | null>(null);
+  const state = queryStateOf({ isLoading, isError, data: media });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: mediaQuery().queryKey });
 
   async function onFiles(files: FileList | null) {
     if (!files?.length) return;
-    setUploading(true);
-    try {
-      for (const file of Array.from(files)) await uploadProductImage(file);
-      toast.success(`${files.length} file(s) uploaded`);
-      refresh();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
-    } finally {
-      setUploading(false);
-    }
+    // 1.3: every file is attempted independently and the report states exactly
+    // what succeeded and what failed — never `files.length`.
+    const result = await uploadMany(Array.from(files));
+    const message = summariseUploads(result);
+    if (result.failed.length === 0) toast.success(message);
+    else if (result.succeeded.length === 0) toast.error(message);
+    else toast.warning(message);
+    refresh();
   }
 
   async function remove(row: MediaRow) {
     try {
-      await deleteProductImage(row.path);
+      await removeOne(row.path);
       await logAudit("delete", "media", row.id, { path: row.path });
       toast.success("File deleted");
       setConfirm(null);
@@ -75,9 +80,11 @@ export function MediaPanel() {
         </label>
       </div>
 
-      {isLoading ? (
+      {state === "error" ? (
+        <QueryFailed message="Could not load the media library." onRetry={() => void refetch()} />
+      ) : state === "loading" ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
-      ) : media.length === 0 ? (
+      ) : state === "empty" ? (
         <p className="rounded-2xl border border-dashed border-border/70 p-10 text-center text-sm text-muted-foreground">
           No media yet.
         </p>
@@ -89,9 +96,12 @@ export function MediaPanel() {
               <div className="absolute inset-x-0 bottom-0 flex justify-between bg-background/85 p-1 opacity-0 transition-opacity group-hover:opacity-100">
                 <button
                   type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(m.url);
-                    toast.success("URL copied");
+                  aria-label={`Copy URL for ${m.alt ?? "this file"}`}
+                  onClick={async () => {
+                    // 1.31: confirm only on ACTUAL success; otherwise offer a
+                    // usable fallback instead of a false "URL copied".
+                    if (await copyToClipboard(m.url)) toast.success("URL copied");
+                    else toast.error("Could not copy automatically", { description: m.url });
                   }}
                   className="rounded p-1 hover:bg-accent"
                 >
@@ -99,6 +109,7 @@ export function MediaPanel() {
                 </button>
                 <button
                   type="button"
+                  aria-label={`Delete ${m.alt ?? "this file"}`}
                   onClick={() => setConfirm(m)}
                   className="rounded p-1 text-destructive hover:bg-destructive/10"
                 >

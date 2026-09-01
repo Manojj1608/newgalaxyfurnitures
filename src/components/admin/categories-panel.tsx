@@ -38,6 +38,8 @@ import {
 import { deleteCategory, logAudit, saveCategory, uploadProductImage } from "@/lib/content-api";
 import { slugify, type CategoryRow } from "@/lib/content-types";
 import { useCategories, useProducts } from "@/hooks/use-content";
+import { changedRows, resequence } from "@/lib/ordering";
+import { QueryFailed } from "@/components/site/query-state";
 
 type Form = {
   name: string;
@@ -67,7 +69,7 @@ const empty: Form = {
 
 export function CategoriesPanel() {
   const queryClient = useQueryClient();
-  const { data: categories = [], isLoading } = useCategories(true);
+  const { data: categories = [], isLoading, isError, refetch } = useCategories(true);
   const { data: products = [] } = useProducts(true);
   const [edit, setEdit] = useState<{ open: boolean; row: CategoryRow | null }>({
     open: false,
@@ -78,17 +80,17 @@ export function CategoriesPanel() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["categories"] });
 
   async function move(row: CategoryRow, dir: -1 | 1) {
-    const siblings = categories
+    // 1.20: the seed in 20260802160613 gave display_order = 99 to EVERY category
+    // derived from products.category, so the old two-row swap wrote 99 and 99 and
+    // nothing moved. Re-sequence the sibling list densely instead.
+    const before = categories
       .filter((c) => c.parent_id === row.parent_id)
-      .sort((a, b) => a.display_order - b.display_order);
-    const idx = siblings.findIndex((c) => c.id === row.id);
-    const swap = siblings[idx + dir];
-    if (!swap) return;
+      .map((c) => ({ id: c.id, order: c.display_order }));
+    const after = resequence(before, row.id, dir);
+    const changes = changedRows(before, after);
+    if (changes.length === 0) return;
     try {
-      await Promise.all([
-        saveCategory({ display_order: swap.display_order }, row.id),
-        saveCategory({ display_order: row.display_order }, swap.id),
-      ]);
+      await Promise.all(changes.map((c) => saveCategory({ display_order: c.order }, c.id)));
       refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Reorder failed");
@@ -139,7 +141,9 @@ export function CategoriesPanel() {
         </Button>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <QueryFailed message="Could not load collections." onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : (
         <div className="space-y-3">

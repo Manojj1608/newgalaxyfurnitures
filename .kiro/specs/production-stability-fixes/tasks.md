@@ -489,12 +489,12 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests over `deriveAccess` for {anonymous, lookup error, no roles, `user`, `editor`, `manager`, `admin`}; manual check that a `user`-only account is bounced from `/admin/dashboard` before any admin query fires — visible as ZERO admin requests in the network panel_
     - _Env: SANDBOX-PARTIAL (unit tests here; live role behaviour NOT-VERIFIABLE-HERE)_
 
-- [ ] 5. Phase 2 — Close the role oracle and fix admin authorization
+- [x] 5. Phase 2 — Close the role oracle and fix admin authorization
 
   Must ship AFTER Phase 1: the guard change is safe alone, but the `anon` revocation must not precede the
   policy split it depends on.
 
-  - [ ] 5.1 Split public-read policies by role, THEN revoke `anon` — one migration, one transaction
+  - [x] 5.1 Split public-read policies by role, THEN revoke `anon` — one migration, one transaction
     - New file `supabase/migrations/<ts>_split_public_read_policies_and_revoke_anon_private.sql`
     - **CRITICAL ORDERING CONSTRAINT — the highest-risk item in this spec.** The `anon` revocation MUST NEVER
       precede the public-read policy role-split it depends on. Both belong in a SINGLE migration executed as a
@@ -538,7 +538,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _**NOT VERIFIED**: live grant and policy state; whether revoking breaks live anonymous reads. Must be reported NOT VERIFIED until the branch-database probe and the post-deploy smoke check both run_
     - _Env: NOT-VERIFIABLE-HERE_
 
-  - [ ] 5.2 Rewrite `useAuth` onto the staff model with a distinguishable error state
+  - [x] 5.2 Rewrite `useAuth` onto the staff model with a distinguishable error state
     - Query ALL roles for the user (`select role from user_roles where user_id = ...`) instead of filtering
       `role = 'admin'`, so `manager` and `editor` resolve correctly (1.11)
     - Inspect the lookup `error` and resolve `status: 'error'` rather than collapsing to `isAdmin: false`, so
@@ -555,7 +555,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests over `deriveAccess` for the full role matrix; a test that a rejected `getUser()` yields `status: 'error'` and never leaves loading; manual check that sign-out and reload behave as before_
     - _Env: SANDBOX-PARTIAL_
 
-  - [ ] 5.3 Dashboard renders denied vs error, and gates tabs by capability
+  - [x] 5.3 Dashboard renders denied vs error, and gates tabs by capability
     - Keep the existing "Access denied / Admins only" card VERBATIM; it now renders for `status: 'denied'` only
     - Add a sibling card for `status: 'error'` with a Retry wired to `retry()`, built from the same
       `luxury-card` + `text-destructive` + `Button` primitives already used by this file's `errorComponent` —
@@ -570,11 +570,11 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests asserting the permitted tab set per role and that error ≠ denied; manual check that an `editor` sees the staff tabs and an `admin` sees all of them_
     - _Env: SANDBOX-PARTIAL_
 
-- [ ] 6. Phase 3 — One shared, validated upload path
+- [x] 6. Phase 3 — One shared, validated upload path
 
   Depends on Phase 1: the bucket must exist.
 
-  - [ ] 6.1 Create `src/lib/uploads.ts` — validation, MIME-derived keys, batch accounting
+  - [x] 6.1 Create `src/lib/uploads.ts` — validation, MIME-derived keys, batch accounting
     - Pure, dependency-free exports so every rule is unit-testable without a database:
       `ALLOWED_IMAGE_MIME = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}`,
       `MAX_UPLOAD_BYTES = 10 * 1024 * 1024`,
@@ -600,7 +600,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests per task 11.1_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 6.2 Fix deletion ordering and make storage failure block the row delete
+  - [x] 6.2 Fix deletion ordering and make storage failure block the row delete
     - `removeImage` in the product dialog STOPS calling `deleteProductImage`. It only mutates form state and
       pushes the object key onto a local `pendingDeletions` list. Objects are deleted AFTER `saveProduct`
       resolves. Cancelling the dialog discards the list and leaves every object intact. Deletion failures are
@@ -617,7 +617,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit test that a failing `.remove()` leaves the `media` row intact; manual product-dialog check — remove an image, CANCEL the dialog, confirm the object still exists_
     - _Env: SANDBOX-PARTIAL_
 
-  - [ ] 6.3 Route every upload surface through one hook that invalidates the media query
+  - [x] 6.3 Route every upload surface through one hook that invalidates the media query
     - New `src/hooks/use-image-upload.ts` owns the mutation and invalidates `contentKeys.media()` on BOTH
       upload and delete
     - Every panel — products, categories, banners, homepage, media, logo — goes through this hook, so the
@@ -628,7 +628,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: assert `contentKeys.media()` is invalidated on upload and delete; manual check that uploading from the product dialog refreshes the media library immediately_
     - _Env: SANDBOX-PARTIAL_
 
-  - [ ] 6.4 Delete the dead duplicate upload implementation; quarantine managed files
+  - [x] 6.4 Delete the dead duplicate upload implementation; quarantine managed files
     - Delete `src/lib/products-api.ts` and `src/lib/products-config.ts` — a second upload/fetch implementation
       with no compression and no validation. Grep confirms nothing imports them (VERIFIED)
     - KEEP `src/integrations/supabase/client.server.ts` and `auth-middleware.ts`: they are integration-managed
@@ -641,9 +641,9 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: re-run the import grep to confirm zero references before deleting; `bun run typecheck`, `bun run lint` and `bun run build` all still pass after deletion_
     - _Env: SANDBOX-COMPLETE_
 
-- [ ] 7. Phase 4 — No operation reports success it cannot demonstrate
+- [x] 7. Phase 4 — No operation reports success it cannot demonstrate
 
-  - [ ] 7.1 Add `.select()` + zero-rows detection to every mutation that must change a row
+  - [x] 7.1 Add `.select()` + zero-rows detection to every mutation that must change a row
     - Add one shared helper: `expectRows<T>(result, entity): T[]` — throws on `error`, throws
       `MutationBlockedError(entity)` when `data` is empty
     - Add `.select('id')` and route through `expectRows` for: `softDeleteProduct`, `restoreProduct`,
@@ -661,7 +661,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests over `expectRows` per task 11.1; manually revoke a role's UPDATE, delete a product, confirm an error rather than "Moved to trash"_
     - _Env: SANDBOX-PARTIAL_
 
-  - [ ] 7.2 Inspect and report the errors currently discarded
+  - [x] 7.2 Inspect and report the errors currently discarded
     - `createEnquiry`, `logProductView` and `logAudit` inspect their `error` and report through the existing
       `reportLovableError` — do not introduce new error infrastructure (3.18)
     - `openProductEnquiry`: remove the empty `catch {}`; catch, report, and STILL open WhatsApp with the
@@ -677,7 +677,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests asserting each function reports when its boundary errors, and that `openProductEnquiry` still returns the byte-identical WhatsApp message (golden value from task 3)_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 7.3 Normalise degenerate ordering values (new append-only migration) and re-sequence densely client-side
+  - [x] 7.3 Normalise degenerate ordering values (new append-only migration) and re-sequence densely client-side
     - Two-part fix because the data is ALREADY degenerate: the seed in `20260802160613` gave
       `display_order = 99` to every category derived from `products.category`
     - New file `supabase/migrations/<ts>_normalise_category_order_and_banner_priority.sql`: a `row_number()
@@ -698,7 +698,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _**NOT VERIFIED**: the live `display_order`/`priority` distribution. The migration is idempotent and safe regardless, but its effect on production data must be reported NOT VERIFIED until run_
     - _Env: SANDBOX-PARTIAL (helper unit-testable here; migration effect NOT-VERIFIABLE-HERE)_
 
-  - [ ] 7.4 Make inline switches reflect persisted state
+  - [x] 7.4 Make inline switches reflect persisted state
     - `patch()` in `products-panel.tsx` records the previous value, applies it optimistically to the `products`
       query cache, toasts confirmation on success, and on failure RESTORES the previous value and toasts the
       error — so the switch always reflects persisted state
@@ -710,7 +710,7 @@ form; tasks within a wave may run in parallel, waves run in order):
 
 - [ ] 8. Phase 5 — loading / empty / error, separated everywhere
 
-  - [ ] 8.1 Add one pure state selector and one presentational error card
+  - [x] 8.1 Add one pure state selector and one presentational error card
     - New `src/components/site/query-state.tsx` exporting
       `queryStateOf({isLoading, isError, data}): 'loading' | 'error' | 'empty' | 'ready'` — **`isError` is
       checked BEFORE emptiness**, so a failed query can never be reported as empty. This single ordering is
@@ -723,7 +723,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit test per task 11.1, including the `{isError, data: []} → 'error'` case that is the regression this family is about_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 8.2 Apply the third branch across every admin panel
+  - [x] 8.2 Apply the third branch across every admin panel
     - Each surface keeps its EXISTING loading text and empty copy VERBATIM ("Loading…", "No media yet.",
       "Trash is empty.", "No products match these filters.", "No hero banners yet.") and gains only the error
       branch. No markup, class or copy is otherwise changed (3.14)

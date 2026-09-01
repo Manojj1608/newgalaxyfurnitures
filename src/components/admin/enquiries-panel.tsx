@@ -27,11 +27,13 @@ import {
 import { logAudit, updateEnquiry } from "@/lib/content-api";
 import { ENQUIRY_STATUSES, type EnquiryRow } from "@/lib/content-types";
 import { useEnquiries } from "@/hooks/use-admin-data";
+import { QueryFailed } from "@/components/site/query-state";
+
 import { contentKeys } from "@/hooks/use-content";
 
 export function EnquiriesPanel() {
   const queryClient = useQueryClient();
-  const { data: enquiries = [], isLoading } = useEnquiries();
+  const { data: enquiries = [], isLoading, isError, refetch } = useEnquiries();
   const [status, setStatus] = useState("All");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<EnquiryRow | null>(null);
@@ -92,7 +94,9 @@ export function EnquiriesPanel() {
         </Select>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <QueryFailed message="Could not load enquiries." onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border/70 p-10 text-center text-sm text-muted-foreground">

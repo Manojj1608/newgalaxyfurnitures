@@ -71,7 +71,10 @@ import {
   type Product,
   type ProductImage,
 } from "@/lib/content-types";
-import { useCategories, useProducts } from "@/hooks/use-content";
+import { contentKeys, useCategories, useProducts } from "@/hooks/use-content";
+import { summarise, uploadImages } from "@/lib/uploads";
+import { QueryFailed } from "@/components/site/query-state";
+
 import { useTrash } from "@/hooks/use-admin-data";
 
 type FormState = {
@@ -194,9 +197,9 @@ function fromProduct(p: Product): FormState {
 
 export function ProductsPanel() {
   const queryClient = useQueryClient();
-  const { data: products = [], isLoading } = useProducts(true);
+  const { data: products = [], isLoading, isError, refetch } = useProducts(true);
   const { data: categories = [] } = useCategories(true);
-  const { data: trashed = [] } = useTrash();
+  const { data: trashed = [], isError: trashError, refetch: refetchTrash } = useTrash();
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -236,11 +239,23 @@ export function ProductsPanel() {
   }, [products, query, category, status, sort]);
 
   async function patch(p: Product, values: Record<string, unknown>) {
+    // 1.21: previously this showed nothing on success and did NOT revert the
+    // switch on failure, so the admin could not tell whether the change
+    // persisted. Apply optimistically, confirm on success, restore on failure.
+    const key = contentKeys.products(true);
+    const previous = queryClient.getQueryData<Product[]>(key);
+    queryClient.setQueryData<Product[]>(key, (rows) =>
+      (rows ?? []).map((row) => (row.id === p.id ? { ...row, ...values } : row)),
+    );
     try {
       await saveProduct(values, p.id);
       await logAudit("update", "product", p.id, values);
+      toast.success("Updated");
       refresh();
     } catch (e) {
+      // Restore the exact previous cache so the control reflects persisted state.
+      if (previous) queryClient.setQueryData(key, previous);
+      else queryClient.invalidateQueries({ queryKey: key });
       toast.error(e instanceof Error ? e.message : "Update failed");
     }
   }
@@ -367,7 +382,16 @@ export function ProductsPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {isLoading ? (
+                  {isError ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-10 text-center">
+                        <QueryFailed
+                          message="Could not load products."
+                          onRetry={() => void refetch()}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ) : isLoading ? (
                     <TableRow>
                       <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
                         Loading…
@@ -451,7 +475,16 @@ export function ProductsPanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {trashed.length === 0 ? (
+                {trashError ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="py-10 text-center">
+                      <QueryFailed
+                        message="Could not load the trash."
+                        onRetry={() => void refetchTrash()}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : trashed.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={3} className="py-10 text-center text-sm text-muted-foreground">
                       Trash is empty.
@@ -543,6 +576,8 @@ function ProductDialog({
   onSaved: () => void;
 }) {
   const tops = categories.filter((c) => !c.parent_id);
+  // 1.5: object keys queued for deletion, applied only AFTER saveProduct resolves.
+  const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
   const [form, setForm] = useState<FormState>(() =>
     emptyForm(tops[0]?.name ?? "Uncategorised", tops[0]?.id ?? null),
   );
@@ -552,6 +587,9 @@ function ProductDialog({
 
   useEffect(() => {
     if (!open) return;
+    // 1.5: discard any queued deletions whenever the dialog (re)opens, so a
+    // cancelled edit never destroys a stored object.
+    setPendingDeletions([]);
     setForm(product ? fromProduct(product) : emptyForm(tops[0]?.name ?? "Uncategorised", tops[0]?.id ?? null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, product]);
@@ -566,21 +604,29 @@ function ProductDialog({
     if (!files || files.length === 0) return;
     setUploading(true);
     try {
-      const uploaded: ProductImage[] = [];
-      for (const file of Array.from(files)) uploaded.push(await uploadProductImage(file));
-      setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
-      toast.success(`${uploaded.length} image(s) uploaded`);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      // 1.3: every file attempted independently; the report states exactly what
+      // succeeded and what failed, with a reason per failure.
+      const result = await uploadImages(Array.from(files), uploadProductImage);
+      if (result.succeeded.length > 0) {
+        setForm((f) => ({ ...f, images: [...f.images, ...result.succeeded] }));
+      }
+      const message = summarise(result);
+      if (result.failed.length === 0) toast.success(message);
+      else if (result.succeeded.length === 0) toast.error(message);
+      else toast.warning(message);
     } finally {
       setUploading(false);
     }
   }
 
-  async function removeImage(idx: number) {
+  function removeImage(idx: number) {
+    // 1.5: previously this called deleteProductImage IMMEDIATELY and swallowed
+    // the result with .catch(() => {}), so the stored object was destroyed even
+    // if the admin then cancelled the dialog, and a failed deletion was
+    // invisible. Now it only mutates form state and queues the object key.
     const img = form.images[idx];
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
-    if (img) await deleteProductImage(img.path).catch(() => {});
+    if (img?.path) setPendingDeletions((keys) => [...keys, img.path]);
   }
 
   function reorder(from: number, to: number) {
@@ -642,7 +688,25 @@ function ProductDialog({
       };
       const saved = await saveProduct(payload, product?.id);
       await logAudit(product ? "update" : "create", "product", saved.id, { name: saved.name });
-      toast.success(product ? "Product updated" : "Product created");
+
+      // 1.5: the owning record is now persisted, so queued objects may be
+      // removed. 1.6: failures are reported, never swallowed.
+      const failedDeletions: string[] = [];
+      for (const key of pendingDeletions) {
+        try {
+          await deleteProductImage(key);
+        } catch {
+          failedDeletions.push(key);
+        }
+      }
+      setPendingDeletions([]);
+      if (failedDeletions.length > 0) {
+        toast.warning(
+          `Saved, but ${failedDeletions.length} removed image(s) could not be deleted from storage.`,
+        );
+      } else {
+        toast.success(product ? "Product updated" : "Product created");
+      }
       onSaved();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Save failed");
