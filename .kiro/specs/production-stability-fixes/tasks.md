@@ -299,7 +299,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: `git ls-files | grep -E '^\.env'` returns only `.env.example`; `git check-ignore -v .env` confirms the ignore rule; grep the repo for `service_role` and confirm zero occurrences_
     - _Env: SANDBOX-COMPLETE (credential rotation itself: NOT-VERIFIABLE-HERE)_
 
-- [ ] 2. Write bug condition exploration test
+- [x] 2. Write bug condition exploration test
   - **Property 1: Bug Condition** - Uninspected failure boundaries reported as success or emptiness
   - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
   - **DO NOT attempt to fix the test or the code when it fails**
@@ -355,7 +355,7 @@ form; tasks within a wave may run in parallel, waves run in order):
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.9, 2.10, 2.11, 2.12, 2.13, 2.14, 2.16, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.37_
   - _Env: SANDBOX-PARTIAL (schema and live-state probes: NOT-VERIFIABLE-HERE)_
 
-- [ ] 3. Write preservation property tests (BEFORE implementing fix)
+- [x] 3. Write preservation property tests (BEFORE implementing fix)
   - **Property 2: Preservation** - Every input outside the bug condition behaves identically
   - **IMPORTANT**: Follow observation-first methodology — run the UNFIXED code first, record the ACTUAL
     outputs as golden values, then assert exactly those observations. Do not assert assumed behaviour
