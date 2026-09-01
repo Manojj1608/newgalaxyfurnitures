@@ -25,6 +25,7 @@ import {
 import { openProductEnquiry } from "@/lib/whatsapp";
 import { toast } from "sonner";
 import { QueryFailed } from "@/components/site/query-state";
+import { ProductNotFound } from "@/components/site/product-not-found";
 import { buildProductMetadata, fallbackProductMetadata } from "@/lib/product-metadata";
 import { copyToClipboard } from "@/lib/clipboard";
 import type { QueryClient } from "@tanstack/react-query";
@@ -140,17 +141,7 @@ function ProductPage() {
   }
 
   if (!product) {
-    return (
-      <main className="page-shell flex min-h-[70vh] flex-col items-center justify-center text-center">
-        <h1 className="font-display text-4xl text-foreground">Piece not found</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          This product may have been removed from the showroom.
-        </p>
-        <Button asChild variant="luxury" className="mt-8 rounded-full">
-          <Link to="/">Back to collection</Link>
-        </Button>
-      </main>
-    );
+    return <ProductNotFound />;
   }
 
   const images = product.images.length > 0 ? product.images : [{ url: PLACEHOLDER_IMAGE, path: "" }];

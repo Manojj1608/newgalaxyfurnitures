@@ -259,7 +259,7 @@
 
 ### Wave 4 — Deferred component tests
 
-- [ ] 14. F11 — Add the three deferred component tests (depends on 4, 7, 8)
+- [x] 14. F11 — Add the three deferred component tests (depends on 4, 7, 8)
   - New test files under the existing `src/test/` convention; **no test deleted, skipped or weakened** (3.25)
   - Media-panel error card: render the real `MediaPanel` with `FakeSupabase` returning `postgrestError(...)`; assert the `QueryFailed` copy "Could not load the media library." and its retry control
   - Product 404 vs load failure: move the two states into a small presentational component in `src/components/site/` with markup and copy **verbatim** ("Piece not found", the removed-from-showroom line, the Back-to-collection CTA); the route imports it. **Do not export a component from the route file** — that would add a 7th `react-refresh` warning and breach 2.22. Test the real component for not-found and the real `QueryFailed` for failure, pinning branch selection through the merged `queryStateOf`
@@ -273,9 +273,9 @@
 
 ### Wave 5 — Verification and change log
 
-- [ ] 15. Final verification run — real exit codes only
+- [x] 15. Final verification run — real exit codes only
 
-  - [ ] 15.1 Run the four commands in this exact order and record real output
+  - [x] 15.1 Run the four commands in this exact order and record real output
     - `bun run typecheck` → record exit code and any diagnostics
     - `bun run test` → record exit code, test count and file count; must be **≥ 259 passing, none deleted, skipped or weakened** (3.25)
     - `bun run build` → record exit code; must succeed with the nine `src/assets/` files gone
@@ -288,14 +288,14 @@
     - _Env: SANDBOX-COMPLETE_
     - _Requirements: 2.22, 3.25, 3.26_
 
-  - [ ] 15.2 Confirm the exploration tests now pass
+  - [x] 15.2 Confirm the exploration tests now pass
     - **Property 1: Expected Behavior** - Deferred Defects Behave Correctly
     - **IMPORTANT**: re-run the SAME tests from task 2 — do NOT write new ones and do NOT add assertions to make them pass
     - **EXPECTED OUTCOME**: tests PASS, confirming each 2.x clause is satisfied
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 15.3 Confirm the preservation tests still pass
+  - [x] 15.3 Confirm the preservation tests still pass
     - **Property 2: Preservation** - Untriggered Surfaces Are Byte-Identical
     - **IMPORTANT**: re-run the SAME tests from task 3 — do NOT write new ones
     - **EXPECTED OUTCOME**: tests PASS, confirming no regressions across 3.1–3.26
@@ -303,7 +303,7 @@
     - _Requirements: 3.1, 3.2, 3.3, 3.8, 3.10, 3.13, 3.20, 3.22, 3.23, 3.25_
     - _Env: SANDBOX-COMPLETE_
 
-- [ ] 16. Write the change log
+- [x] 16. Write the change log
   - One entry per resolved defect with all seven fields: **Issue, Root cause, Files changed, Fix implemented, Verification performed, Result, Severity** (severity taken from the 1.x clause)
   - Three clearly separated sections:
     - **(a) Inherited already-fixed from PR #1** — bucket migration, storage policies, admin guard + staff `useAuth`, anon role-oracle revocation, `.env` untracking, the shared upload pipeline, `mutations.ts`, `query-state.ts` + `QueryFailed`, `product-metadata.ts`, `clipboard.ts`, dead-code removal, test infrastructure. **Not re-fixed, not re-claimed here**
