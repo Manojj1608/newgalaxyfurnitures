@@ -38,6 +38,8 @@ import {
 } from "@/lib/content-api";
 import { SECTION_LABELS, type HeroBanner, type HomepageSection } from "@/lib/content-types";
 import { useBanners, useSections } from "@/hooks/use-content";
+import { changedRows, resequence } from "@/lib/ordering";
+import { QueryFailed } from "@/components/site/query-state";
 
 export function HomepagePanel() {
   return (
@@ -64,7 +66,7 @@ export function HomepagePanel() {
 
 function SectionsList() {
   const queryClient = useQueryClient();
-  const { data: sections = [], isLoading } = useSections(true);
+  const { data: sections = [], isLoading, isError, refetch } = useSections(true);
   const [edit, setEdit] = useState<HomepageSection | null>(null);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["sections"] });
@@ -97,6 +99,10 @@ function SectionsList() {
     }
   }
 
+  if (isError)
+    return (
+      <QueryFailed message="Could not load homepage sections." onRetry={() => void refetch()} />
+    );
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
 
   return (
@@ -215,7 +221,12 @@ const emptyBanner: BannerForm = {
 
 function BannersList() {
   const queryClient = useQueryClient();
-  const { data: banners = [], isLoading } = useBanners(true);
+  const {
+    data: banners = [],
+    isLoading,
+    isError: bannersError,
+    refetch: refetchBanners,
+  } = useBanners(true);
   const [edit, setEdit] = useState<{ open: boolean; row: HeroBanner | null }>({ open: false, row: null });
   const [confirm, setConfirm] = useState<HeroBanner | null>(null);
 
@@ -232,17 +243,17 @@ function BannersList() {
   }
 
   async function move(index: number, dir: -1 | 1) {
-    const next = [...ordered];
-    const target = index + dir;
-    if (target < 0 || target >= next.length) return;
-    const a = next[index];
-    const b = next[target];
-    if (!a || !b) return;
+    // 1.20: swapping two `priority` values is a no-op whenever siblings share a
+    // value. Re-sequence the whole list densely instead, and write only the rows
+    // whose value actually changed — each of which now reports affected rows.
+    const target = ordered[index];
+    if (!target) return;
+    const before = ordered.map((b) => ({ id: b.id, order: b.priority }));
+    const after = resequence(before, target.id, dir);
+    const changes = changedRows(before, after);
+    if (changes.length === 0) return;
     try {
-      await Promise.all([
-        saveBanner({ priority: b.priority }, a.id),
-        saveBanner({ priority: a.priority }, b.id),
-      ]);
+      await Promise.all(changes.map((row) => saveBanner({ priority: row.order }, row.id)));
       refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Reorder failed");
@@ -268,7 +279,9 @@ function BannersList() {
           <Plus /> New banner
         </Button>
       </div>
-      {isLoading ? (
+      {bannersError ? (
+        <QueryFailed message="Could not load hero banners." onRetry={() => void refetchBanners()} />
+      ) : isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : ordered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">

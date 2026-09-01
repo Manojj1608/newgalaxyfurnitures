@@ -1,5 +1,6 @@
 import { createEnquiry } from "@/lib/content-api";
 import { effectivePrice, formatINR, primaryImage, type Product } from "@/lib/content-types";
+import { reportLovableError } from "@/lib/lovable-error-reporting";
 
 export function whatsappHref(phone: string, message: string): string {
   return `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
@@ -38,8 +39,15 @@ export async function openProductEnquiry(
       source_page: sourcePage,
       channel: "whatsapp",
     });
-  } catch {
-    // never block the customer on analytics
+  } catch (e) {
+    // 1.32: never block the customer — but never discard the loss either. The
+    // empty `catch {}` meant a failed enquiry insert was invisible even though
+    // error-reporting infrastructure already existed.
+    reportLovableError(e, {
+      fn: "openProductEnquiry",
+      product_id: product.id,
+      source_page: sourcePage,
+    });
   }
   if (typeof window !== "undefined") {
     window.open(whatsappHref(phone, message), "_blank", "noopener,noreferrer");

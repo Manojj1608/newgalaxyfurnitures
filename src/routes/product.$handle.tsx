@@ -23,25 +23,43 @@ import {
   type Product,
 } from "@/lib/content-types";
 import { openProductEnquiry } from "@/lib/whatsapp";
+import { toast } from "sonner";
+import { QueryFailed } from "@/components/site/query-state";
+import { buildProductMetadata, fallbackProductMetadata } from "@/lib/product-metadata";
+import { copyToClipboard } from "@/lib/clipboard";
+import type { QueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/product/$handle")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.handle.replace(/-/g, " ")} | New Galaxy Furniture` },
-      {
-        name: "description",
-        content:
-          "Premium furniture handcrafted in Bengaluru by New Galaxy Furniture. View details, materials, dimensions and enquire on WhatsApp.",
-      },
-      { property: "og:type", content: "product" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: `${params.handle.replace(/-/g, " ")} | New Galaxy Furniture` },
-      {
-        property: "og:description",
-        content: "Handcrafted premium furniture from New Galaxy Furniture, Bengaluru.",
-      },
-    ],
-  }),
+  // 1.28: warm the product query so head() can read the REAL record. Rendering
+  // still uses useQuery against the same key, so there is no double fetch and no
+  // change to the render path.
+  loader: async ({ context, params }) => {
+    const queryClient = (context as { queryClient?: QueryClient } | undefined)?.queryClient;
+    if (!queryClient) return { product: null };
+    try {
+      const product = await queryClient.ensureQueryData({
+        ...productQuery(params.handle),
+        queryKey: contentKeys.product(params.handle),
+      });
+      return { product: product ?? null };
+    } catch {
+      // A failed warm must not break the route; head() falls back and the
+      // component renders its own error state.
+      return { product: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const product = loaderData?.product;
+    // Purely additive: without loader data the existing handle-derived tags
+    // remain as the fallback.
+    if (!product) return fallbackProductMetadata(params.handle);
+    const { meta, links, jsonLd } = buildProductMetadata(product);
+    return {
+      meta,
+      links,
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
+    };
+  },
   component: ProductPage,
 });
 
@@ -59,7 +77,12 @@ function ProductPage() {
   const { handle } = useParams({ from: "/product/$handle" });
   useContentRealtime();
 
-  const { data: product, isLoading } = useQuery({
+  const {
+    data: product,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     ...productQuery(handle),
     queryKey: contentKeys.product(handle),
   });
@@ -101,6 +124,21 @@ function ProductPage() {
     );
   }
 
+  // 1.27: a transient failure previously fell through to "Piece not found",
+  // telling the customer a product that exists had been removed. The 404 copy,
+  // markup, route and CTA below are UNCHANGED and now render only when the query
+  // SUCCEEDED and the product genuinely does not exist or is not published.
+  if (isError) {
+    return (
+      <main className="page-shell flex min-h-[70vh] flex-col items-center justify-center">
+        <QueryFailed
+          message="Could not load this piece. Please check your connection and try again."
+          onRetry={() => void refetch()}
+        />
+      </main>
+    );
+  }
+
   if (!product) {
     return (
       <main className="page-shell flex min-h-[70vh] flex-col items-center justify-center text-center">
@@ -128,9 +166,14 @@ function ProductPage() {
         /* fall through to copy */
       }
     }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    // 1.31: this previously had no catch, producing an unhandled rejection and a
+    // "Link copied" state that could be false. Confirm only on real success.
+    if (await copyToClipboard(url)) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      toast.error("Could not copy the link automatically", { description: url });
+    }
   };
 
   return (

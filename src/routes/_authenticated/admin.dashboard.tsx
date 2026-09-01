@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_authenticated/admin/dashboard")({
 });
 
 function AdminPage() {
-  const { loading, user, isAdmin } = useAuth();
+  const { loading, user, isStaff, isManager, status, error, retry } = useAuth();
   const navigate = useNavigate();
 
   async function signOut() {
@@ -51,15 +51,42 @@ function AdminPage() {
     );
   }
 
-  if (!isAdmin) {
+  // 1.12: "we could not complete the check" is NOT "you are denied". Same
+  // luxury-card + text-destructive + Button primitives as errorComponent above,
+  // so no new design language is introduced (3.14).
+  if (status === "error") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="luxury-card max-w-md p-8 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Access check failed
+          </p>
+          <h1 className="mt-4 font-display text-4xl text-foreground">Could not verify access</h1>
+          <p className="mt-4 text-sm leading-7 text-destructive">
+            {error ?? "Your access could not be verified."}
+          </p>
+          <div className="mt-6 flex justify-center gap-2">
+            <Button variant="outlineWarm" onClick={retry}>
+              Retry
+            </Button>
+            <Button onClick={signOut}>Sign out</Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // 1.11: gate on isStaff, not isAdmin, so managers and editors are admitted
+  // according to the three-tier model the database already implements.
+  if (!isStaff) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="luxury-card max-w-md p-8 text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Access denied</p>
-          <h1 className="mt-4 font-display text-4xl text-foreground">Admins only</h1>
+          <h1 className="mt-4 font-display text-4xl text-foreground">Staff only</h1>
           <p className="mt-4 text-sm leading-7 text-muted-foreground">
-            You are signed in as <span className="font-medium">{user?.email}</span> but do not have admin
-            privileges.
+            You are signed in as <span className="font-medium">{user?.email}</span> but do not have
+            staff privileges.
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <Button asChild variant="outlineWarm">
@@ -101,13 +128,16 @@ function AdminPage() {
 
       <section className="page-shell py-10">
         <Tabs defaultValue="products" className="space-y-8">
+          {/* Tabs are gated by capability: content surfaces need isStaff,
+              enquiries and settings are manager-level. An admin satisfies both
+              and therefore sees every tab exactly as before (3.9). */}
           <TabsList className="flex h-auto flex-wrap justify-start gap-1">
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="collections">Collections</TabsTrigger>
             <TabsTrigger value="homepage">Homepage</TabsTrigger>
-            <TabsTrigger value="enquiries">Enquiries</TabsTrigger>
+            {isManager ? <TabsTrigger value="enquiries">Enquiries</TabsTrigger> : null}
             <TabsTrigger value="media">Media</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            {isManager ? <TabsTrigger value="settings">Settings</TabsTrigger> : null}
           </TabsList>
           <TabsContent value="products">
             <ProductsPanel />
@@ -118,15 +148,19 @@ function AdminPage() {
           <TabsContent value="homepage">
             <HomepagePanel />
           </TabsContent>
-          <TabsContent value="enquiries">
-            <EnquiriesPanel />
-          </TabsContent>
+          {isManager ? (
+            <TabsContent value="enquiries">
+              <EnquiriesPanel />
+            </TabsContent>
+          ) : null}
           <TabsContent value="media">
             <MediaPanel />
           </TabsContent>
-          <TabsContent value="settings">
-            <SettingsPanel />
-          </TabsContent>
+          {isManager ? (
+            <TabsContent value="settings">
+              <SettingsPanel />
+            </TabsContent>
+          ) : null}
         </Tabs>
       </section>
     </main>

@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { logAudit, saveSettings } from "@/lib/content-api";
 import { useSettings } from "@/hooks/use-content";
+import { QueryFailed } from "@/components/site/query-state";
+
 import type { SiteSettings } from "@/lib/content-types";
 
 const TEXT_FIELDS: [keyof SiteSettings, string][] = [
@@ -38,11 +40,16 @@ const LONG_FIELDS: [keyof SiteSettings, string][] = [
 
 export function SettingsPanel() {
   const queryClient = useQueryClient();
-  const { data: settings, isLoading } = useSettings();
+  // 1.25: isError was never read, so a failed load was reported as
+  // "No settings row found." — a load failure disguised as missing data.
+  const { data: settings, isLoading, isError, refetch } = useSettings();
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
   const [saving, setSaving] = useState(false);
 
+  if (isError)
+    return <QueryFailed message="Could not load site settings." onRetry={() => void refetch()} />;
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  // This copy now renders ONLY when the query SUCCEEDED and returned null.
   if (!settings) return <p className="text-sm text-muted-foreground">No settings row found.</p>;
 
   const value = (key: keyof SiteSettings) =>
