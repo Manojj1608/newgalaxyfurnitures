@@ -181,7 +181,7 @@
 
 ### Wave 3 — Priority 2: independent families (6–13 parallelisable)
 
-- [ ] 6. F3 — Classify hero CTA links
+- [x] 6. F3 — Classify hero CTA links
   - Edit `src/components/site/hero-slider.tsx` only; `src/lib/links.ts` is **NOT edited**
   - Replace the `startsWith("#")` ternary (`:49-64`) with `classifyLink(banner.button_link)` and a four-way render: `anchor` → today's `<a href>`; `external` → `<a href rel="noopener noreferrer">`; `internal` → `<Link to={cta.href}>`; `none` → render nothing
   - Classes, copy and position unchanged (3.9)
@@ -190,7 +190,7 @@
   - _Env: SANDBOX-COMPLETE_
   - _Requirements: 1.6, 2.6, 3.9, 3.10_
 
-- [ ] 7. F4 — robots.txt crawler contract
+- [x] 7. F4 — robots.txt crawler contract
   - Edit `public/robots.txt`: keep `User-agent: *` and `Allow: /`, add `Disallow: /admin` and `Sitemap: https://newgalaxyfurnitures.lovable.app/sitemap.xml`
   - Origin reconciled with `SITE_ORIGIN` (`src/lib/product-metadata.ts:19`) — no new URL invented
   - Supplements the per-route `noindex` and the login `next` guard; replaces neither (3.21). No public URL changes; nothing indexable today is disallowed
@@ -198,7 +198,7 @@
   - _Env: SANDBOX-COMPLETE (file bytes) / NOT-VERIFIABLE-HERE (which domain production actually serves — a static file cannot read the request origin)_
   - _Requirements: 1.7, 2.7, 3.20, 3.21_
 
-- [ ] 8. F5 — Sitemap failure handling
+- [x] 8. F5 — Sitemap failure handling
   - **New** `src/lib/sitemap.ts`; **edit** `src/routes/sitemap[.]xml.ts`
   - Lift `renderSitemapXml(origin, rows)` and `sitemapResponse({ origin, data, error })` **verbatim** out of the handler
   - `error` non-null → `503` + `Cache-Control: no-store`, so no crawler can cache an incomplete document; `error` null → today's XML with `application/xml` + `max-age=3600`, **byte-identical** (3.20)
@@ -208,7 +208,7 @@
   - _Env: SANDBOX-COMPLETE_
   - _Requirements: 1.8, 2.8, 2.22, 3.20, 3.24_
 
-- [ ] 9. F6 — Hero accessibility and motion
+- [x] 9. F6 — Hero accessibility and motion
   - **New** `src/hooks/use-prefers-reduced-motion.tsx`; **edit** `src/components/site/hero-slider.tsx`
   - Tap target (2.9): pagination `<button>` keeps its exact `h-1 rounded-full … w-10/w-4` visual classes and gains `relative` + `after:absolute after:inset-x-0 after:-inset-y-5 after:content-['']` → ~44px. Growing the button box would move the hero copy; the pseudo-element changes no pixel (3.9, 3.18)
   - Pause (2.10): `paused` state set on pagination `onClick` and on `onMouseEnter`/`onFocus`/`onTouchStart` of the `<section>`, cleared on leave/blur; the interval effect early-returns. `7000`, the `banners.length < 2` guard and priority ordering untouched
@@ -218,7 +218,7 @@
   - _Env: SANDBOX-COMPLETE (jsdom timer/matchMedia behaviour, class diff) / NOT-VERIFIABLE-HERE (real tap-target size on a device, real motion rendering)_
   - _Requirements: 1.9, 1.10, 1.11, 1.12, 2.9, 2.10, 2.11, 2.12, 3.9, 3.18_
 
-- [ ] 10. F7 — Catalogue suggestion combobox
+- [x] 10. F7 — Catalogue suggestion combobox
   - Edit `src/components/site/catalogue.tsx` only. **Do NOT touch the `suggestions` useMemo at `:174`, nor any filter, sort, paging or clear/reset logic** (3.8)
   - Local state only: `open`, `active`, `useId()`, `boxRef`
   - Input gains `role="combobox"`, `aria-controls`, `aria-expanded` reflecting real state, `aria-autocomplete="list"`, `aria-activedescendant` when `active >= 0`; existing `aria-label="Search products"`, classes and `onChange` kept
@@ -230,7 +230,7 @@
   - _Env: SANDBOX-COMPLETE (roles, keyboard model, result-set preservation) / NOT-VERIFIABLE-HERE (real screen-reader announcement)_
   - _Requirements: 1.13, 1.14, 1.15, 2.13, 2.14, 2.15, 3.8_
 
-- [ ] 11. F8 — Accessible names and label association
+- [x] 11. F8 — Accessible names and label association
   - Edit `products-panel.tsx`, `categories-panel.tsx`, `homepage-panel.tsx`, `settings-panel.tsx`, `enquiries-panel.tsx`
   - Icon-only controls (2.16) get `aria-label` naming **action + target** in PR #1's media-panel pattern — `products-panel.tsx:452,455,505`, `categories-panel.tsx:171-195`, `homepage-panel.tsx:126-133,303-313`. Attribute-only, no visual change
   - `enquiries-panel.tsx` is excluded from 2.16 (its icons sit beside visible text) but carries one `<Label>` for 2.17
@@ -240,7 +240,7 @@
   - _Env: SANDBOX-COMPLETE (attribute presence, id uniqueness) / NOT-VERIFIABLE-HERE (real screen-reader output)_
   - _Requirements: 1.16, 1.17, 2.16, 2.17, 3.13_
 
-- [ ] 12. F9 — Image intrinsic sizing without commit-phase writes
+- [x] 12. F9 — Image intrinsic sizing without commit-phase writes
   - Edit `src/components/site/adaptive-image.tsx`, `src/components/site/product-card.tsx`
   - Replace the `ref={(el) => …}` callback with `useRef` + a post-commit `useEffect` that measures when `complete && naturalWidth && naturalHeight`, committing only when the **clamped applied** ratio actually changes. The `onLoad` path for non-cached images is unchanged. A genuinely different ratio still costs one re-render — inherent to measuring after load, not over-claimed
   - **Preserve byte-identically** (3.2): `product-media` / `product-media-img` classes, `minRatio 0.75` / `maxRatio 1.5` / `fallbackRatio 1` in `AdaptiveImage`, `Math.min(1.25, Math.max(0.8, …))` in `ProductCard`, the `style={{ aspectRatio }}` frame, and the `PLACEHOLDER_IMAGE` `onError` fallback (3.3). Hover image, badges and "Made to order" overlay untouched
@@ -250,7 +250,7 @@
   - _Env: SANDBOX-COMPLETE (render counts, clamp preservation, attribute presence) / NOT-VERIFIABLE-HERE (real layout shift, per-viewport selection, Supabase transform availability)_
   - _Requirements: 1.18, 1.19, 2.18, 2.19, 3.2, 3.3_
 
-- [ ] 13. F10 — Delete unreferenced bundler assets
+- [x] 13. F10 — Delete unreferenced bundler assets
   - Delete exactly nine files: `src/assets/{category-bedroom,category-chairs,category-dining,category-office,category-outdoor,category-sofas,category-storage,category-tables,hero-luxury-living}.jpg` — bundler-scoped, so no external URL can resolve to them
   - **Keep all nine `public/media/*` files** — directly addressable, external dependence **NOT VERIFIED** (3.22). Nothing a production URL could resolve to is touched
   - _Verify:_ `git grep -n -e "@/assets" -e "src/assets" -- src | wc -l` → 0 before deleting; after, `ls src/assets 2>/dev/null | wc -l` → 0, `ls public/media | wc -l` → 9, and `bun run build` succeeds.

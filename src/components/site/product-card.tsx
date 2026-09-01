@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Eye, MessageCircle } from "lucide-react";
 
@@ -12,6 +12,17 @@ import {
   type Product,
 } from "@/lib/content-types";
 import { openProductEnquiry } from "@/lib/whatsapp";
+
+/**
+ * 2.19: matches the real grid. Module-private and repeated from
+ * adaptive-image.tsx on purpose — exporting a constant from a component file
+ * trips `react-refresh/only-export-components` and would breach the recorded
+ * lint baseline (2.22).
+ */
+const PRODUCT_IMAGE_SIZES = "(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw";
+
+/** Nominal intrinsic width used to derive a height from the applied ratio. */
+const NOMINAL_WIDTH = 1200;
 
 export function ProductCard({
   product,
@@ -32,7 +43,20 @@ export function ProductCard({
   const measure = (el: HTMLImageElement) => {
     if (el.naturalWidth && el.naturalHeight) setNatural(el.naturalWidth / el.naturalHeight);
   };
+  const imgRef = useRef<HTMLImageElement>(null);
 
+  /**
+   * Defect 1.18: this used to run from a `ref` callback during commit, forcing an
+   * extra render for every cached-complete image. Measuring in an effect is
+   * post-commit, and the guard means nothing is committed unless the CLAMPED
+   * applied ratio actually changes.
+   */
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el?.complete || !el.naturalWidth || !el.naturalHeight) return;
+    const measured = el.naturalWidth / el.naturalHeight;
+    if (Math.min(1.25, Math.max(0.8, measured)) !== ratio) setNatural(measured);
+  }, [image, ratio]);
 
   return (
     <article className="group luxury-card overflow-hidden">
@@ -47,13 +71,14 @@ export function ProductCard({
           style={{ aspectRatio: String(ratio) }}
         >
           <img
+            ref={imgRef}
             src={image}
             alt={product.name}
+            width={NOMINAL_WIDTH}
+            height={Math.round(NOMINAL_WIDTH / ratio)}
+            sizes={PRODUCT_IMAGE_SIZES}
             loading="lazy"
             decoding="async"
-            ref={(el) => {
-              if (el?.complete) measure(el);
-            }}
             onLoad={(e) => measure(e.currentTarget)}
             onError={(e) => {
               e.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -69,7 +94,6 @@ export function ProductCard({
               className="product-media-img absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
             />
           ) : null}
-
 
           <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
             {product.new_arrival ? <Badge variant="secondary">New</Badge> : null}

@@ -63,7 +63,7 @@ export function SettingsPanel() {
   if (!settings) return <p className="text-sm text-muted-foreground">No settings row found.</p>;
 
   const value = (key: keyof SiteSettings) =>
-    draft?.[key as string] ?? ((settings[key] as string | null) ?? "");
+    draft?.[key as string] ?? (settings[key] as string | null) ?? "";
 
   function set(key: keyof SiteSettings, v: string) {
     setDraft((d) => ({ ...(d ?? {}), [key as string]: v }));
@@ -173,8 +173,12 @@ export function SettingsPanel() {
       <div className="grid gap-4 sm:grid-cols-2">
         {TEXT_FIELDS.map(([key, label]) => (
           <div key={key as string} className="space-y-2">
-            <Label>{label}</Label>
-            <Input value={value(key)} onChange={(e) => set(key, e.target.value)} />
+            <Label htmlFor={`${uid}-${key}`}>{label}</Label>
+            <Input
+              id={`${uid}-${key}`}
+              value={value(key)}
+              onChange={(e) => set(key, e.target.value)}
+            />
           </div>
         ))}
       </div>
@@ -182,8 +186,13 @@ export function SettingsPanel() {
       <div className="grid gap-4">
         {LONG_FIELDS.map(([key, label]) => (
           <div key={key as string} className="space-y-2">
-            <Label>{label}</Label>
-            <Textarea rows={3} value={value(key)} onChange={(e) => set(key, e.target.value)} />
+            <Label htmlFor={`${uid}-${key}`}>{label}</Label>
+            <Textarea
+              id={`${uid}-${key}`}
+              rows={3}
+              value={value(key)}
+              onChange={(e) => set(key, e.target.value)}
+            />
           </div>
         ))}
       </div>

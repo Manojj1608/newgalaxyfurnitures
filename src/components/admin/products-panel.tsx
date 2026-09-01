@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   GripVertical,
@@ -302,8 +302,9 @@ export function ProductsPanel() {
         <div>
           <h2 className="font-display text-3xl text-foreground">Products</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {products.length} total · {products.filter((p) => p.status === "active").length} published ·{" "}
-            {products.filter((p) => p.featured).length} featured · {trashed.length} in trash
+            {products.length} total · {products.filter((p) => p.status === "active").length}{" "}
+            published · {products.filter((p) => p.featured).length} featured · {trashed.length} in
+            trash
           </p>
         </div>
         <Button variant="luxury" size="lg" onClick={() => setEdit({ open: true, product: null })}>
@@ -393,13 +394,19 @@ export function ProductsPanel() {
                     </TableRow>
                   ) : isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                      <TableCell
+                        colSpan={7}
+                        className="py-10 text-center text-sm text-muted-foreground"
+                      >
                         Loading…
                       </TableCell>
                     </TableRow>
                   ) : filtered.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                      <TableCell
+                        colSpan={7}
+                        className="py-10 text-center text-sm text-muted-foreground"
+                      >
                         No products match these filters.
                       </TableCell>
                     </TableRow>
@@ -408,7 +415,11 @@ export function ProductsPanel() {
                       <TableRow key={p.id}>
                         <TableCell>
                           {p.images[0] ? (
-                            <img src={p.images[0].url} alt="" className="product-media product-media-img h-12 w-12 rounded-md" />
+                            <img
+                              src={p.images[0].url}
+                              alt=""
+                              className="product-media product-media-img h-12 w-12 rounded-md"
+                            />
                           ) : (
                             <div className="grid h-12 w-12 place-content-center rounded-md bg-muted text-muted-foreground">
                               <ImageIcon className="h-4 w-4" />
@@ -417,13 +428,17 @@ export function ProductsPanel() {
                         </TableCell>
                         <TableCell>
                           <div className="font-medium text-foreground">{p.name}</div>
-                          <div className="text-xs text-muted-foreground">{p.sku || p.material || "—"}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {p.sku || p.material || "—"}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary">{p.category}</Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">{formatINR(Number(p.sale_price ?? p.price))}</div>
+                          <div className="font-medium">
+                            {formatINR(Number(p.sale_price ?? p.price))}
+                          </div>
                           {p.sale_price ? (
                             <div className="text-xs text-muted-foreground line-through">
                               {formatINR(Number(p.price))}
@@ -437,7 +452,9 @@ export function ProductsPanel() {
                               onCheckedChange={(v) => patch(p, { in_stock: v })}
                               aria-label="In stock"
                             />
-                            <span className="text-xs text-muted-foreground">{p.stock_quantity}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {p.stock_quantity}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -448,10 +465,20 @@ export function ProductsPanel() {
                           />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button size="sm" variant="ghost" onClick={() => setEdit({ open: true, product: p })}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEdit({ open: true, product: p })}
+                            aria-label={`Edit ${p.name}`}
+                          >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(p)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setConfirmDelete(p)}
+                            aria-label={`Move ${p.name} to trash`}
+                          >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </TableCell>
@@ -486,7 +513,10 @@ export function ProductsPanel() {
                   </TableRow>
                 ) : trashed.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="py-10 text-center text-sm text-muted-foreground">
+                    <TableCell
+                      colSpan={3}
+                      className="py-10 text-center text-sm text-muted-foreground"
+                    >
                       Trash is empty.
                     </TableCell>
                   </TableRow>
@@ -501,7 +531,12 @@ export function ProductsPanel() {
                         <Button size="sm" variant="ghost" onClick={() => doRestore(p)}>
                           <RotateCcw className="h-4 w-4" /> Restore
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setConfirmPurge(p)}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setConfirmPurge(p)}
+                          aria-label={`Permanently delete ${p.name}`}
+                        >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -530,7 +565,8 @@ export function ProductsPanel() {
           <AlertDialogHeader>
             <AlertDialogTitle>Move to trash?</AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmDelete?.name} will be hidden from the website. You can restore it from the Trash tab.
+              {confirmDelete?.name} will be hidden from the website. You can restore it from the
+              Trash tab.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -575,6 +611,9 @@ function ProductDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  // 2.17: one id namespace per mounted instance, so a dialog closed and reopened
+  // (or two rows rendered together) can never produce a duplicate id.
+  const uid = useId();
   const tops = categories.filter((c) => !c.parent_id);
   // 1.5: object keys queued for deletion, applied only AFTER saveProduct resolves.
   const [pendingDeletions, setPendingDeletions] = useState<string[]>([]);
@@ -590,7 +629,11 @@ function ProductDialog({
     // 1.5: discard any queued deletions whenever the dialog (re)opens, so a
     // cancelled edit never destroys a stored object.
     setPendingDeletions([]);
-    setForm(product ? fromProduct(product) : emptyForm(tops[0]?.name ?? "Uncategorised", tops[0]?.id ?? null));
+    setForm(
+      product
+        ? fromProduct(product)
+        : emptyForm(tops[0]?.name ?? "Uncategorised", tops[0]?.id ?? null),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, product]);
 
@@ -655,7 +698,9 @@ function ProductDialog({
         subcategory_id: form.subcategory_id,
         price: Number(form.price) || 0,
         sale_price:
-          form.sale_price === null || Number.isNaN(form.sale_price) ? null : Number(form.sale_price),
+          form.sale_price === null || Number.isNaN(form.sale_price)
+            ? null
+            : Number(form.sale_price),
         stock_quantity: Number(form.stock_quantity) || 0,
         low_stock_threshold: Number(form.low_stock_threshold) || 0,
         short_description: form.short_description || null,
@@ -723,16 +768,17 @@ function ProductDialog({
             {product ? "Edit product" : "New product"}
           </DialogTitle>
           <DialogDescription>
-            Everything here appears on the storefront instantly — catalogue, search, collections and the
-            product page.
+            Everything here appears on the storefront instantly — catalogue, search, collections and
+            the product page.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Name *</Label>
+              <Label htmlFor={`${uid}-name`}>Name *</Label>
               <Input
+                id={`${uid}-name`}
                 value={form.name}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -745,15 +791,16 @@ function ProductDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Slug</Label>
+              <Label htmlFor={`${uid}-slug`}>Slug</Label>
               <Input
+                id={`${uid}-slug`}
                 value={form.slug}
                 onChange={(e) => set("slug", slugify(e.target.value))}
                 placeholder="auto-generated"
               />
             </div>
             <div className="space-y-2">
-              <Label>Category *</Label>
+              <Label htmlFor={`${uid}-category`}>Category *</Label>
               <Select
                 value={form.category_id ?? ""}
                 onValueChange={(v) => {
@@ -766,7 +813,7 @@ function ProductDialog({
                   }));
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger id={`${uid}-category`}>
                   <SelectValue placeholder="Select a collection" />
                 </SelectTrigger>
                 <SelectContent>
@@ -779,13 +826,13 @@ function ProductDialog({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Subcategory</Label>
+              <Label htmlFor={`${uid}-subcategory`}>Subcategory</Label>
               <Select
                 value={form.subcategory_id ?? "none"}
                 onValueChange={(v) => set("subcategory_id", v === "none" ? null : v)}
                 disabled={subs.length === 0}
               >
-                <SelectTrigger>
+                <SelectTrigger id={`${uid}-subcategory`}>
                   <SelectValue placeholder={subs.length ? "Optional" : "None available"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -799,16 +846,25 @@ function ProductDialog({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>SKU</Label>
-              <Input value={form.sku} onChange={(e) => set("sku", e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Product code</Label>
-              <Input value={form.product_code} onChange={(e) => set("product_code", e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Price (INR) *</Label>
+              <Label htmlFor={`${uid}-sku`}>SKU</Label>
               <Input
+                id={`${uid}-sku`}
+                value={form.sku}
+                onChange={(e) => set("sku", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`${uid}-product-code`}>Product code</Label>
+              <Input
+                id={`${uid}-product-code`}
+                value={form.product_code}
+                onChange={(e) => set("product_code", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`${uid}-price-inr`}>Price (INR) *</Label>
+              <Input
+                id={`${uid}-price-inr`}
                 type="number"
                 min="0"
                 step="1"
@@ -818,18 +874,22 @@ function ProductDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Sale price</Label>
+              <Label htmlFor={`${uid}-sale-price`}>Sale price</Label>
               <Input
+                id={`${uid}-sale-price`}
                 type="number"
                 min="0"
                 step="1"
                 value={form.sale_price ?? ""}
-                onChange={(e) => set("sale_price", e.target.value === "" ? null : Number(e.target.value))}
+                onChange={(e) =>
+                  set("sale_price", e.target.value === "" ? null : Number(e.target.value))
+                }
               />
             </div>
             <div className="space-y-2">
-              <Label>Stock quantity</Label>
+              <Label htmlFor={`${uid}-stock-quantity`}>Stock quantity</Label>
               <Input
+                id={`${uid}-stock-quantity`}
                 type="number"
                 min="0"
                 value={form.stock_quantity}
@@ -837,8 +897,9 @@ function ProductDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Low stock alert at</Label>
+              <Label htmlFor={`${uid}-low-stock-alert-at`}>Low stock alert at</Label>
               <Input
+                id={`${uid}-low-stock-alert-at`}
                 type="number"
                 min="0"
                 value={form.low_stock_threshold}
@@ -846,16 +907,22 @@ function ProductDialog({
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label>Short description</Label>
+              <Label htmlFor={`${uid}-short-description`}>Short description</Label>
               <Input
+                id={`${uid}-short-description`}
                 value={form.short_description}
                 onChange={(e) => set("short_description", e.target.value)}
                 placeholder="One line shown on cards"
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label>Description</Label>
-              <Textarea rows={4} value={form.description} onChange={(e) => set("description", e.target.value)} />
+              <Label htmlFor={`${uid}-description`}>Description</Label>
+              <Textarea
+                id={`${uid}-description`}
+                rows={4}
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+              />
             </div>
           </div>
 
@@ -874,26 +941,39 @@ function ProductDialog({
               ] as const
             ).map(([key, label]) => (
               <div key={key} className="space-y-2">
-                <Label>{label}</Label>
-                <Input value={form[key]} onChange={(e) => set(key, e.target.value)} />
+                <Label htmlFor={`${uid}-${key}`}>{label}</Label>
+                <Input
+                  id={`${uid}-${key}`}
+                  value={form[key]}
+                  onChange={(e) => set(key, e.target.value)}
+                />
               </div>
             ))}
             <div className="space-y-2 sm:col-span-2">
-              <Label>Delivery info</Label>
-              <Input value={form.delivery_info} onChange={(e) => set("delivery_info", e.target.value)} />
+              <Label htmlFor={`${uid}-delivery-info`}>Delivery info</Label>
+              <Input
+                id={`${uid}-delivery-info`}
+                value={form.delivery_info}
+                onChange={(e) => set("delivery_info", e.target.value)}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Tags (comma separated)</Label>
-              <Input value={form.tags} onChange={(e) => set("tags", e.target.value)} />
+              <Label htmlFor={`${uid}-tags-comma-separated`}>Tags (comma separated)</Label>
+              <Input
+                id={`${uid}-tags-comma-separated`}
+                value={form.tags}
+                onChange={(e) => set("tags", e.target.value)}
+              />
             </div>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label>Images</Label>
+              <Label htmlFor={`${uid}-images`}>Images</Label>
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-input bg-background px-4 py-2 text-xs uppercase tracking-[0.24em] hover:bg-accent">
                 <Upload className="h-3.5 w-3.5" /> {uploading ? "Uploading…" : "Upload"}
                 <input
+                  id={`${uid}-images`}
                   type="file"
                   accept="image/*"
                   multiple
@@ -925,7 +1005,11 @@ function ProductDialog({
                       idx === 0 ? "border-wood ring-2 ring-wood/30" : "border-border/60"
                     }`}
                   >
-                    <img src={img.url} alt="" className="product-media product-media-img aspect-4/5 w-full" />
+                    <img
+                      src={img.url}
+                      alt=""
+                      className="product-media product-media-img aspect-4/5 w-full"
+                    />
                     <span className="absolute left-1 top-1 rounded-full bg-background/85 px-2 py-0.5 text-[10px] uppercase tracking-wider">
                       <GripVertical className="inline h-3 w-3" /> Drag
                     </span>
@@ -960,9 +1044,9 @@ function ProductDialog({
 
           <div className="grid gap-4 rounded-xl border border-border/60 p-4 sm:grid-cols-3">
             <div className="space-y-2 sm:col-span-3">
-              <Label>Status</Label>
+              <Label htmlFor={`${uid}-status`}>Status</Label>
               <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger className="sm:w-56">
+                <SelectTrigger id={`${uid}-status`} className="sm:w-56">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -994,16 +1078,29 @@ function ProductDialog({
           <div className="grid gap-4 rounded-xl border border-border/60 p-4">
             <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">SEO</p>
             <div className="space-y-2">
-              <Label>Meta title</Label>
-              <Input value={form.meta_title} onChange={(e) => set("meta_title", e.target.value)} />
+              <Label htmlFor={`${uid}-meta-title`}>Meta title</Label>
+              <Input
+                id={`${uid}-meta-title`}
+                value={form.meta_title}
+                onChange={(e) => set("meta_title", e.target.value)}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Meta description</Label>
-              <Textarea rows={2} value={form.meta_description} onChange={(e) => set("meta_description", e.target.value)} />
+              <Label htmlFor={`${uid}-meta-description`}>Meta description</Label>
+              <Textarea
+                id={`${uid}-meta-description`}
+                rows={2}
+                value={form.meta_description}
+                onChange={(e) => set("meta_description", e.target.value)}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Keywords</Label>
-              <Input value={form.keywords} onChange={(e) => set("keywords", e.target.value)} />
+              <Label htmlFor={`${uid}-keywords`}>Keywords</Label>
+              <Input
+                id={`${uid}-keywords`}
+                value={form.keywords}
+                onChange={(e) => set("keywords", e.target.value)}
+              />
             </div>
           </div>
 

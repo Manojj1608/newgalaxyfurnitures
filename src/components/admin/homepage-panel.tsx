@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp, Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -40,6 +40,15 @@ import { SECTION_LABELS, type HeroBanner, type HomepageSection } from "@/lib/con
 import { useBanners, useSections } from "@/hooks/use-content";
 import { changedRows, resequence } from "@/lib/ordering";
 import { QueryFailed } from "@/components/site/query-state";
+
+/**
+ * Module-private (not exported, so it adds no react-refresh warning). Names a
+ * section the same way the visible row label does, so 2.16's accessible names
+ * state action + target using the wording the admin already sees.
+ */
+function sectionLabel(s: HomepageSection): string {
+  return SECTION_LABELS[s.section_type] ?? s.section_type;
+}
 
 export function HomepagePanel() {
   return (
@@ -122,14 +131,31 @@ function SectionsList() {
             </div>
             <p className="truncate text-xs text-muted-foreground">{s.title || "No heading"}</p>
           </div>
-          <Button size="sm" variant="ghost" onClick={() => move(i, -1)} disabled={i === 0}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => move(i, -1)}
+            disabled={i === 0}
+            aria-label={`Move ${sectionLabel(s)} up`}
+          >
             <ChevronUp className="h-4 w-4" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => move(i, 1)} disabled={i === ordered.length - 1}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => move(i, 1)}
+            disabled={i === ordered.length - 1}
+            aria-label={`Move ${sectionLabel(s)} down`}
+          >
             <ChevronDown className="h-4 w-4" />
           </Button>
           <Switch checked={s.enabled} onCheckedChange={(v) => toggle(s, v)} aria-label="Enabled" />
-          <Button size="sm" variant="ghost" onClick={() => setEdit(s)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setEdit(s)}
+            aria-label={`Edit ${sectionLabel(s)}`}
+          >
             <Pencil className="h-4 w-4" />
           </Button>
         </div>
@@ -140,7 +166,7 @@ function SectionsList() {
           <DialogHeader>
             <DialogTitle className="font-display text-2xl">Section copy</DialogTitle>
             <DialogDescription>
-              {edit ? SECTION_LABELS[edit.section_type] ?? edit.section_type : ""}
+              {edit ? (SECTION_LABELS[edit.section_type] ?? edit.section_type) : ""}
             </DialogDescription>
           </DialogHeader>
           {edit && (
@@ -159,6 +185,9 @@ function SectionsList() {
 }
 
 function SectionForm({ section, onSaved }: { section: HomepageSection; onSaved: () => void }) {
+  // 2.17: one id namespace per mounted instance, so a dialog closed and reopened
+  // (or two rows rendered together) can never produce a duplicate id.
+  const uid = useId();
   const [title, setTitle] = useState(section.title ?? "");
   const [subtitle, setSubtitle] = useState(section.subtitle ?? "");
   const [saving, setSaving] = useState(false);
@@ -181,12 +210,16 @@ function SectionForm({ section, onSaved }: { section: HomepageSection; onSaved: 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-2">
-        <Label>Heading</Label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Label htmlFor={`${uid}-heading`}>Heading</Label>
+        <Input id={`${uid}-heading`} value={title} onChange={(e) => setTitle(e.target.value)} />
       </div>
       <div className="space-y-2">
-        <Label>Sub-heading</Label>
-        <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
+        <Label htmlFor={`${uid}-sub-heading`}>Sub-heading</Label>
+        <Input
+          id={`${uid}-sub-heading`}
+          value={subtitle}
+          onChange={(e) => setSubtitle(e.target.value)}
+        />
       </div>
       <DialogFooter>
         <Button type="submit" variant="luxury" disabled={saving}>
@@ -227,7 +260,10 @@ function BannersList() {
     isError: bannersError,
     refetch: refetchBanners,
   } = useBanners(true);
-  const [edit, setEdit] = useState<{ open: boolean; row: HeroBanner | null }>({ open: false, row: null });
+  const [edit, setEdit] = useState<{ open: boolean; row: HeroBanner | null }>({
+    open: false,
+    row: null,
+  });
   const [confirm, setConfirm] = useState<HeroBanner | null>(null);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["banners"] });
@@ -290,7 +326,10 @@ function BannersList() {
       ) : (
         <div className="space-y-3">
           {ordered.map((b, i) => (
-            <div key={b.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-background/60 p-4">
+            <div
+              key={b.id}
+              className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-background/60 p-4"
+            >
               <img src={b.image_url} alt="" className="h-14 w-24 rounded-lg object-cover" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -299,17 +338,43 @@ function BannersList() {
                 </div>
                 <p className="truncate text-xs text-muted-foreground">{b.subtitle}</p>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => move(i, -1)} disabled={i === 0}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => move(i, -1)}
+                disabled={i === 0}
+                aria-label={`Move banner ${b.title} up`}
+              >
                 <ChevronUp className="h-4 w-4" />
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => move(i, 1)} disabled={i === ordered.length - 1}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => move(i, 1)}
+                disabled={i === ordered.length - 1}
+                aria-label={`Move banner ${b.title} down`}
+              >
                 <ChevronDown className="h-4 w-4" />
               </Button>
-              <Switch checked={b.active} onCheckedChange={(v) => toggle(b, v)} aria-label="Active" />
-              <Button size="sm" variant="ghost" onClick={() => setEdit({ open: true, row: b })}>
+              <Switch
+                checked={b.active}
+                onCheckedChange={(v) => toggle(b, v)}
+                aria-label="Active"
+              />
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setEdit({ open: true, row: b })}
+                aria-label={`Edit banner ${b.title}`}
+              >
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setConfirm(b)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setConfirm(b)}
+                aria-label={`Delete banner ${b.title}`}
+              >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
@@ -359,6 +424,9 @@ function BannerDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  // 2.17: one id namespace per mounted instance, so a dialog closed and reopened
+  // (or two rows rendered together) can never produce a duplicate id.
+  const uid = useId();
   const [form, setForm] = useState<BannerForm>(emptyBanner);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -429,12 +497,16 @@ function BannerDialog({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[92vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">{row ? "Edit banner" : "New banner"}</DialogTitle>
-          <DialogDescription>Hero slides rotate in priority order on the homepage.</DialogDescription>
+          <DialogTitle className="font-display text-2xl">
+            {row ? "Edit banner" : "New banner"}
+          </DialogTitle>
+          <DialogDescription>
+            Hero slides rotate in priority order on the homepage.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-5">
           <div className="space-y-2">
-            <Label>Image *</Label>
+            <Label htmlFor={`${uid}-image`}>Image *</Label>
             {form.image_url ? (
               <div className="relative overflow-hidden rounded-xl border border-border/60">
                 <img src={form.image_url} alt="" className="aspect-[21/9] w-full object-cover" />
@@ -450,6 +522,7 @@ function BannerDialog({
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border/70 p-8 text-xs uppercase tracking-[0.24em] text-muted-foreground hover:bg-accent">
                 <Upload className="h-3.5 w-3.5" /> {uploading ? "Uploading…" : "Upload image"}
                 <input
+                  id={`${uid}-image`}
                   type="file"
                   accept="image/*"
                   className="hidden"
@@ -463,32 +536,51 @@ function BannerDialog({
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Eyebrow</Label>
-              <Input value={form.eyebrow} onChange={(e) => setForm({ ...form, eyebrow: e.target.value })} />
+              <Label htmlFor={`${uid}-eyebrow`}>Eyebrow</Label>
+              <Input
+                id={`${uid}-eyebrow`}
+                value={form.eyebrow}
+                onChange={(e) => setForm({ ...form, eyebrow: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Title *</Label>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+              <Label htmlFor={`${uid}-title`}>Title *</Label>
+              <Input
+                id={`${uid}-title`}
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                required
+              />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label>Subtitle</Label>
-              <Input value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Button text</Label>
-              <Input value={form.button_text} onChange={(e) => setForm({ ...form, button_text: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Button link</Label>
+              <Label htmlFor={`${uid}-subtitle`}>Subtitle</Label>
               <Input
+                id={`${uid}-subtitle`}
+                value={form.subtitle}
+                onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`${uid}-button-text`}>Button text</Label>
+              <Input
+                id={`${uid}-button-text`}
+                value={form.button_text}
+                onChange={(e) => setForm({ ...form, button_text: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`${uid}-button-link`}>Button link</Label>
+              <Input
+                id={`${uid}-button-link`}
                 value={form.button_link}
                 onChange={(e) => setForm({ ...form, button_link: e.target.value })}
                 placeholder="#catalogue"
               />
             </div>
             <div className="space-y-2">
-              <Label>Priority</Label>
+              <Label htmlFor={`${uid}-priority`}>Priority</Label>
               <Input
+                id={`${uid}-priority`}
                 type="number"
                 value={form.priority}
                 onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })}
@@ -496,7 +588,10 @@ function BannerDialog({
             </div>
           </div>
           <label className="flex items-center gap-3 rounded-xl border border-border/60 p-4 text-sm">
-            <Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />
+            <Switch
+              checked={form.active}
+              onCheckedChange={(v) => setForm({ ...form, active: v })}
+            />
             Active
           </label>
           <DialogFooter>

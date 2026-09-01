@@ -348,12 +348,24 @@ describe("case 8 — 1.16, 1.17: admin controls are named and labels are associa
     expect(unnamed).toEqual([]);
   });
 
-  it("2.17 — every admin Label is associated, and the total is the recorded 40", () => {
+  it("2.17 — every admin Label is associated, with no unaccounted label sites", () => {
     const actual = Object.fromEntries(counts.map((c) => [c.file, c.htmlFor]));
     const oneForEachLabel = Object.fromEntries(counts.map((c) => [c.file, c.labels]));
 
+    // The binding invariant: every Label in every panel is associated.
     expect(actual).toEqual(oneForEachLabel);
-    expect(counts.reduce((n, c) => n + c.htmlFor, 0)).toBe(40);
+
+    // 1.17 recorded 40 label sites (products 20, homepage 9, categories 8,
+    // settings 2, enquiries 1) with zero htmlFor. F2's managed-asset logo control
+    // adds exactly one further associated Label to settings-panel, so the total
+    // is 40 + 1. Every site is accounted for; none was removed.
+    expect(counts.reduce((n, c) => n + c.labels, 0)).toBe(41);
+    expect(counts.reduce((n, c) => n + c.htmlFor, 0)).toBe(41);
+    expect(counts.find((c) => c.file === "settings-panel.tsx")).toEqual({
+      file: "settings-panel.tsx",
+      labels: 3,
+      htmlFor: 3,
+    });
   });
 });
 
