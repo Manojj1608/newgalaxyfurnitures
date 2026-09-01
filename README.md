@@ -24,3 +24,16 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Deployment
+
+This project deploys to Cloudflare Workers. Requires Node.js 20+.
+
+```sh
+bun install
+bun run deploy
+```
+
+Supabase credentials must be set as **both** build-time (`VITE_*`) and runtime Worker variables —
+a missing build-time variable produces a successful build and a broken site. See
+[DEPLOY.md](./DEPLOY.md) for the full procedure, the complete variable list, and known pitfalls.
