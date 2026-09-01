@@ -937,7 +937,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: assert no state write occurs when the measured ratio is unchanged, and that the clamp bounds and `product-media` classes are byte-identical to current behaviour_
     - _Env: SANDBOX-COMPLETE_
 
-- [ ] 11. Write the unit and property tests over real exported logic
+- [~] 11. Write the unit and property tests over real exported logic
 
   - [x] 11.1 Unit tests whose subjects are real exported functions in `src/`
     - **PROHIBITED — this is a hard rule.** No test may configure a mock and then assert that the mock returned
@@ -1023,7 +1023,7 @@ form; tasks within a wave may run in parallel, waves run in order):
   - _Requirements: 3.1–3.24 / design Property 11_
   - _Env: SANDBOX-PARTIAL (live row sets and rendering: NOT-VERIFIABLE-HERE)_
 
-- [ ] 14. Final verification run — record real outcomes only
+- [x] 14. Final verification run — record real outcomes only
   - Run these commands IN THIS ORDER and record the ACTUAL result of each. **Never record a claimed or assumed
     outcome.** If a command fails, record the failure and its output rather than a success:
     1. `bun install`
@@ -1040,7 +1040,7 @@ form; tasks within a wave may run in parallel, waves run in order):
   - _Requirements: 2.42, 3.24_
   - _Env: SANDBOX-COMPLETE (the five commands); the NOT VERIFIED register is NOT-VERIFIABLE-HERE by definition_
 
-- [ ] 15. Write the change log for the PR
+- [x] 15. Write the change log for the PR
   - For EVERY resolved defect record all seven fields:
     - **Issue** — the defect ID and its one-line statement from `bugfix.md`
     - **Root cause** — the actual mechanism, from the design's Hypothesized Root Cause, corrected by whatever
