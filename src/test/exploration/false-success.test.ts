@@ -120,7 +120,9 @@ describe("1.19 — a partially failed reorder must not report success", () => {
       tables: {
         homepage_sections: (op) => {
           const id = op.filters.find((f) => f.column === "id")?.value;
-          return id === "sec-2" ? postgrestError("permission denied") : { data: [{ id }], error: null };
+          return id === "sec-2"
+            ? postgrestError("permission denied")
+            : { data: [{ id }], error: null };
         },
       },
     });

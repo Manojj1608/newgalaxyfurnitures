@@ -62,7 +62,10 @@ export function deriveAccess(
   roles: readonly string[],
   lookupError: unknown,
 ): Access {
-  if (!user) return { status: "anonymous" };
+  // A reported failure outranks an absent session: a rejected getUser() or a
+  // failed user_roles lookup is a TRANSIENT failure, and reporting it as
+  // "anonymous" would bounce a signed-in admin to the login page (1.13, 1.14).
+  // Only a lookup that genuinely succeeded with no user is anonymous.
   if (lookupError) {
     return {
       status: "error",
@@ -74,6 +77,7 @@ export function deriveAccess(
             : "Could not verify your access. Please retry.",
     };
   }
+  if (!user) return { status: "anonymous" };
   const isStaff = isStaffRoles(roles);
   if (!isStaff) return { status: "denied", user };
   return {
@@ -103,7 +107,7 @@ export async function loadAccess(): Promise<Access> {
   let user: User | null = null;
   try {
     const { data, error } = await supabase.auth.getUser();
-    if (error) return deriveAccess({} as User, [], error);
+    if (error) return deriveAccess(null, [], error);
     user = data.user ?? null;
   } catch (e) {
     // A rejected getUser() is a transient failure, NOT an absent session.
@@ -111,10 +115,7 @@ export async function loadAccess(): Promise<Access> {
   }
   if (!user) return { status: "anonymous" };
 
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id);
+  const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
 
   const roles = (data ?? []).map((r) => (r as { role: string }).role);
   return deriveAccess(user, roles, error);

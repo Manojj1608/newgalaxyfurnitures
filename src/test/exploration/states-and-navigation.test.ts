@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 
 describe("1.23–1.27 — a failed query is never reported as an empty one", () => {
   it("error takes precedence over emptiness", async () => {
-    const { queryStateOf } = await import("@/components/site/query-state");
+    const { queryStateOf } = await import("@/lib/query-state");
 
     // This single ordering is the whole 1.23–1.26 family: an error with an empty
     // data default currently renders "No media yet." / "Trash is empty." etc.
@@ -20,7 +20,7 @@ describe("1.23–1.27 — a failed query is never reported as an empty one", () 
   });
 
   it("distinguishes loading, empty and ready", async () => {
-    const { queryStateOf } = await import("@/components/site/query-state");
+    const { queryStateOf } = await import("@/lib/query-state");
 
     expect(queryStateOf({ isLoading: true, isError: false, data: undefined })).toBe("loading");
     expect(queryStateOf({ isLoading: false, isError: false, data: [] })).toBe("empty");
@@ -29,7 +29,7 @@ describe("1.23–1.27 — a failed query is never reported as an empty one", () 
   });
 
   it("a non-collection payload that loaded successfully is 'ready'", async () => {
-    const { queryStateOf } = await import("@/components/site/query-state");
+    const { queryStateOf } = await import("@/lib/query-state");
     // 1.25: a settings row that genuinely loaded must not be called empty.
     expect(queryStateOf({ isLoading: false, isError: false, data: { id: true } })).toBe("ready");
   });

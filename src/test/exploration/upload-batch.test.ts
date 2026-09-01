@@ -45,6 +45,7 @@ describe("1.3 — a batch upload reports exactly what succeeded and what failed"
     });
 
     const { uploadImages } = await import("@/lib/uploads");
+    const { uploadProductImage } = await import("@/lib/content-api");
     const files = [
       fileOf("1.jpg", "image/jpeg"),
       fileOf("2.jpg", "image/jpeg"),
@@ -53,7 +54,9 @@ describe("1.3 — a batch upload reports exactly what succeeded and what failed"
       fileOf("5.jpg", "image/jpeg"),
     ];
 
-    const result = await uploadImages(files);
+    // uploadImages takes the upload function as an injected boundary; the real
+    // uploadProductImage is passed, so both are exercised for real.
+    const result = await uploadImages(files, uploadProductImage);
 
     expect(result.succeeded).toHaveLength(4);
     expect(result.failed).toHaveLength(1);
@@ -75,13 +78,17 @@ describe("1.3 — a batch upload reports exactly what succeeded and what failed"
 
   it("an invalid file in the batch does not prevent its valid siblings uploading", async () => {
     const { uploadImages } = await import("@/lib/uploads");
-    const result = await uploadImages([
-      fileOf("good-1.jpg", "image/jpeg"),
-      fileOf("bad.pdf", "application/pdf"),
-      fileOf("good-2.png", "image/png"),
-    ]);
+    const { uploadProductImage } = await import("@/lib/content-api");
+    const result = await uploadImages(
+      [
+        fileOf("good-1.jpg", "image/jpeg"),
+        fileOf("bad.pdf", "application/pdf"),
+        fileOf("good-2.png", "image/png"),
+      ],
+      uploadProductImage,
+    );
 
     expect(result.succeeded).toHaveLength(2);
-    expect(result.failed.map((f) => f.name)).toEqual(["bad.pdf"]);
+    expect(result.failed.map((f: { name: string }) => f.name)).toEqual(["bad.pdf"]);
   });
 });
