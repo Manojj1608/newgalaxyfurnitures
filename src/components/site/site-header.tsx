@@ -4,53 +4,12 @@ import { Menu } from "lucide-react";
 
 import type { CategoryRow, SiteSettings } from "@/lib/content-types";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { BrandMark } from "@/components/site/brand-mark";
 
-export function NGMonogram({ className = "h-9 w-9" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 64 64" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="ng-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#e8cf9a" />
-          <stop offset="50%" stopColor="#c9a44c" />
-          <stop offset="100%" stopColor="#8f6f2c" />
-        </linearGradient>
-      </defs>
-      <ellipse
-        cx="32"
-        cy="32"
-        rx="29"
-        ry="14"
-        fill="none"
-        stroke="url(#ng-gold)"
-        strokeWidth="1"
-        opacity="0.55"
-        transform="rotate(-24 32 32)"
-      />
-      <ellipse
-        cx="32"
-        cy="32"
-        rx="29"
-        ry="14"
-        fill="none"
-        stroke="url(#ng-gold)"
-        strokeWidth="1"
-        opacity="0.35"
-        transform="rotate(28 32 32)"
-      />
-      <text
-        x="32"
-        y="41"
-        textAnchor="middle"
-        fontFamily="Cormorant Garamond, serif"
-        fontSize="26"
-        fill="url(#ng-gold)"
-        letterSpacing="1"
-      >
-        NG
-      </text>
-    </svg>
-  );
-}
+// `NGMonogram` moved verbatim into brand-mark.tsx, which now owns the mark. It is
+// re-exported here so index.tsx's existing import path keeps working. Both files
+// export components only, so no react-refresh warning is added.
+export { NGMonogram } from "@/components/site/brand-mark";
 
 export function SiteHeader({
   settings,
@@ -81,11 +40,7 @@ export function SiteHeader({
     >
       <div className="page-shell flex h-20 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-3">
-          {settings?.logo_url ? (
-            <img src={settings.logo_url} alt="" className="h-9 w-auto" />
-          ) : (
-            <NGMonogram />
-          )}
+          <BrandMark settings={settings} size="header" />
           <span className="leading-tight">
             <span
               className={`block font-display text-xl ${scrolled ? "text-foreground" : "text-primary-foreground"}`}

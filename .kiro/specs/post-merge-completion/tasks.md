@@ -136,9 +136,9 @@
 
 ### Wave 2 — Priority 1: logo
 
-- [ ] 4. F1 — Wire the guarded brand mark into all three sites
+- [x] 4. F1 — Wire the guarded brand mark into all three sites
 
-  - [ ] 4.1 Create `src/components/site/brand-mark.tsx`
+  - [x] 4.1 Create `src/components/site/brand-mark.tsx`
     - Move `NGMonogram` **verbatim** out of `site-header.tsx`; keep `aria-hidden` on it
     - `site-header.tsx` re-exports it (`export { NGMonogram } from "./brand-mark"`) so `index.tsx`'s existing import path is untouched
     - `BrandMark({ settings, size: "header" | "about" | "footer" })`: `resolveLogoSrc(settings?.logo_url)`, `failed` state reset by `useEffect` on `src` change, monogram when `src === null || failed`, else `<img>` with `onError={() => setFailed(true)}`
@@ -150,21 +150,21 @@
     - _Env: SANDBOX-COMPLETE_
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3_
 
-  - [ ] 4.2 Replace the header ternary
+  - [x] 4.2 Replace the header ternary
     - `site-header.tsx:84-87` → `<BrandMark settings={settings} size="header" />`
     - Nothing else changes: fixed positioning, `h-20` bar, scroll-transition colours, company name, tagline, nav, mobile sheet (3.4)
     - _Verify:_ `git diff src/components/site/site-header.tsx` is confined to the mark call site plus the `NGMonogram` re-export.
     - _Env: SANDBOX-COMPLETE_
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.4_
 
-  - [ ] 4.3 Wire the about and footer marks
+  - [x] 4.3 Wire the about and footer marks
     - `src/routes/index.tsx:260` → `size="about"`; `:395` → `size="footer"`; `settings` is already in scope at both
     - Removes the two-simultaneous-marks defect (1.5) while keeping both existing sizes for the no-logo case (3.1)
     - _Verify:_ `grep -n "NGMonogram" src/routes/index.tsx` returns no direct render, and `git diff` touches only those two call sites.
     - _Env: SANDBOX-COMPLETE_
     - _Requirements: 1.5, 2.5, 3.1_
 
-- [ ] 5. F2 — Managed-asset logo control in the settings panel (depends on 4)
+- [x] 5. F2 — Managed-asset logo control in the settings panel (depends on 4)
   - Edit `src/components/admin/settings-panel.tsx` **only**
   - Remove `["logo_url", "Logo URL"]` from `TEXT_FIELDS`; every other field keeps its position, copy and save path (3.13)
   - Add one `Label` / preview / actions block above the text grid, built from `Button` + `Input` + `Label` already imported there — no new design vocabulary (3.18)
