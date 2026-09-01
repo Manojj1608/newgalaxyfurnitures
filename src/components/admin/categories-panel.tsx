@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp, Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -155,7 +155,11 @@ export function CategoriesPanel() {
               <div key={c.id} className="rounded-2xl border border-border/60 bg-background/60 p-4">
                 <div className="flex flex-wrap items-center gap-3">
                   {c.thumbnail_url ? (
-                    <img src={c.thumbnail_url} alt="" className="product-media product-media-img h-12 w-12 rounded-lg" />
+                    <img
+                      src={c.thumbnail_url}
+                      alt=""
+                      className="product-media product-media-img h-12 w-12 rounded-lg"
+                    />
                   ) : (
                     <div className="h-12 w-12 rounded-lg bg-muted" />
                   )}
@@ -167,17 +171,41 @@ export function CategoriesPanel() {
                     <p className="truncate text-xs text-muted-foreground">/{c.slug}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => move(c, -1)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => move(c, -1)}
+                      aria-label={`Move ${c.name} up`}
+                    >
                       <ChevronUp className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => move(c, 1)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => move(c, 1)}
+                      aria-label={`Move ${c.name} down`}
+                    >
                       <ChevronDown className="h-4 w-4" />
                     </Button>
-                    <Switch checked={c.visible} onCheckedChange={(v) => toggleVisible(c, v)} aria-label="Visible" />
-                    <Button size="sm" variant="ghost" onClick={() => setEdit({ open: true, row: c })}>
+                    <Switch
+                      checked={c.visible}
+                      onCheckedChange={(v) => toggleVisible(c, v)}
+                      aria-label="Visible"
+                    />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setEdit({ open: true, row: c })}
+                      aria-label={`Edit ${c.name}`}
+                    >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setConfirm(c)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setConfirm(c)}
+                      aria-label={`Delete ${c.name}`}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -188,10 +216,20 @@ export function CategoriesPanel() {
                       <div key={k.id} className="flex items-center gap-3">
                         <span className="flex-1 text-sm text-foreground">{k.name}</span>
                         <Switch checked={k.visible} onCheckedChange={(v) => toggleVisible(k, v)} />
-                        <Button size="sm" variant="ghost" onClick={() => setEdit({ open: true, row: k })}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEdit({ open: true, row: k })}
+                          aria-label={`Edit ${k.name}`}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setConfirm(k)}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setConfirm(k)}
+                          aria-label={`Delete ${k.name}`}
+                        >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -221,7 +259,8 @@ export function CategoriesPanel() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete collection?</AlertDialogTitle>
             <AlertDialogDescription>
-              {confirm?.name} will be removed. Products in it stay in the catalogue but lose this collection.
+              {confirm?.name} will be removed. Products in it stay in the catalogue but lose this
+              collection.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -249,6 +288,9 @@ function CategoryDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  // 2.17: one id namespace per mounted instance, so a dialog closed and reopened
+  // (or two rows rendered together) can never produce a duplicate id.
+  const uid = useId();
   const [form, setForm] = useState<Form>(empty);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<"thumb" | "banner" | null>(null);
@@ -326,31 +368,42 @@ function CategoryDialog({
           <DialogTitle className="font-display text-2xl">
             {row ? "Edit collection" : "New collection"}
           </DialogTitle>
-          <DialogDescription>Collections drive the homepage grid and catalogue filters.</DialogDescription>
+          <DialogDescription>
+            Collections drive the homepage grid and catalogue filters.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Name *</Label>
+              <Label htmlFor={`${uid}-name`}>Name *</Label>
               <Input
+                id={`${uid}-name`}
                 value={form.name}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value, slug: row ? f.slug : slugify(e.target.value) }))
+                  setForm((f) => ({
+                    ...f,
+                    name: e.target.value,
+                    slug: row ? f.slug : slugify(e.target.value),
+                  }))
                 }
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label>Slug</Label>
-              <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} />
+              <Label htmlFor={`${uid}-slug`}>Slug</Label>
+              <Input
+                id={`${uid}-slug`}
+                value={form.slug}
+                onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Parent collection</Label>
+              <Label htmlFor={`${uid}-parent-collection`}>Parent collection</Label>
               <Select
                 value={form.parent_id ?? "none"}
                 onValueChange={(v) => setForm({ ...form, parent_id: v === "none" ? null : v })}
               >
-                <SelectTrigger>
+                <SelectTrigger id={`${uid}-parent-collection`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -366,16 +419,22 @@ function CategoryDialog({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Display order</Label>
+              <Label htmlFor={`${uid}-display-order`}>Display order</Label>
               <Input
+                id={`${uid}-display-order`}
                 type="number"
                 value={form.display_order}
                 onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label>Description</Label>
-              <Textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <Label htmlFor={`${uid}-description`}>Description</Label>
+              <Textarea
+                id={`${uid}-description`}
+                rows={3}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
             </div>
           </div>
 
@@ -387,7 +446,7 @@ function CategoryDialog({
               ] as const
             ).map(([kind, label, url, field]) => (
               <div key={kind} className="space-y-2">
-                <Label>{label}</Label>
+                <Label htmlFor={`${uid}-${kind}`}>{label}</Label>
                 {url ? (
                   <div className="relative overflow-hidden rounded-xl border border-border/60">
                     <img src={url} alt="" className="aspect-[4/3] w-full object-cover" />
@@ -404,6 +463,7 @@ function CategoryDialog({
                     <Upload className="h-3.5 w-3.5" />
                     {uploading === kind ? "Uploading…" : "Upload"}
                     <input
+                      id={`${uid}-${kind}`}
                       type="file"
                       accept="image/*"
                       className="hidden"
@@ -420,17 +480,28 @@ function CategoryDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Meta title</Label>
-              <Input value={form.meta_title} onChange={(e) => setForm({ ...form, meta_title: e.target.value })} />
+              <Label htmlFor={`${uid}-meta-title`}>Meta title</Label>
+              <Input
+                id={`${uid}-meta-title`}
+                value={form.meta_title}
+                onChange={(e) => setForm({ ...form, meta_title: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Meta description</Label>
-              <Input value={form.meta_description} onChange={(e) => setForm({ ...form, meta_description: e.target.value })} />
+              <Label htmlFor={`${uid}-meta-description`}>Meta description</Label>
+              <Input
+                id={`${uid}-meta-description`}
+                value={form.meta_description}
+                onChange={(e) => setForm({ ...form, meta_description: e.target.value })}
+              />
             </div>
           </div>
 
           <label className="flex items-center gap-3 rounded-xl border border-border/60 p-4 text-sm">
-            <Switch checked={form.visible} onCheckedChange={(v) => setForm({ ...form, visible: v })} />
+            <Switch
+              checked={form.visible}
+              onCheckedChange={(v) => setForm({ ...form, visible: v })}
+            />
             Visible on the website
           </label>
 

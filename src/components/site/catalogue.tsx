@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Filter, Search, X } from "lucide-react";
 
 import { ProductCard } from "@/components/site/product-card";
@@ -79,6 +79,13 @@ export function Catalogue({
   const [sort, setSort] = useState<SortKey>("newest");
   const [visible, setVisible] = useState(PAGE_SIZE);
   const gridRef = useRef<HTMLDivElement>(null);
+  // 1.13–1.15: the suggestion popup had no combobox semantics, no keyboard model
+  // and never closed. All state below is local to the popup; the `suggestions`
+  // useMemo, the filters, the sorts and the paging are untouched (3.8).
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
+  const comboId = useId();
+  const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (externalCategory) {
@@ -178,6 +185,57 @@ export function Catalogue({
       .filter((p) => p.name.toLowerCase().includes(q))
       .slice(0, 5);
   }, [products, search]);
+
+  const listOpen = open && suggestions.length > 0;
+
+  // 1.15: there was no outside-click dismissal, so the popup could only be closed
+  // by clearing or changing the query — covering the results just asked for.
+  useEffect(() => {
+    if (!listOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!boxRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [listOpen]);
+
+  function applySuggestion(name: string) {
+    setSearch(name);
+    setOpen(false);
+    setActive(-1);
+  }
+
+  /** 2.14: ArrowDown/ArrowUp with wraparound, Enter to select, Escape to dismiss. */
+  function onSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!open) {
+        setOpen(true);
+        setActive(e.key === "ArrowDown" ? 0 : suggestions.length - 1);
+        return;
+      }
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setActive((i) => (i + step + suggestions.length) % suggestions.length);
+      return;
+    }
+
+    if (e.key === "Enter" && open && active >= 0) {
+      // Only intercept when a suggestion is highlighted; otherwise today's submit
+      // behaviour is left alone.
+      e.preventDefault();
+      const chosen = suggestions[active];
+      if (chosen) applySuggestion(chosen.name);
+      return;
+    }
+
+    if (e.key === "Escape") {
+      // Dismiss without clearing the query (2.14).
+      setOpen(false);
+      setActive(-1);
+    }
+  }
 
   const hasFilters =
     search !== "" ||
@@ -297,14 +355,24 @@ export function Catalogue({
         {subtitle ? <p className="section-copy mt-4 max-w-2xl">{subtitle}</p> : null}
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
+          <div className="relative flex-1" ref={boxRef}>
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setOpen(true);
+                setActive(-1);
+              }}
+              onKeyDown={onSearchKeyDown}
               placeholder="Search by name, SKU, material, colour…"
               className="h-12 rounded-full pl-11"
               aria-label="Search products"
+              role="combobox"
+              aria-controls={`${comboId}-listbox`}
+              aria-expanded={listOpen}
+              aria-autocomplete="list"
+              aria-activedescendant={active >= 0 ? `${comboId}-opt-${active}` : undefined}
             />
             {search ? (
               <button
@@ -316,14 +384,27 @@ export function Catalogue({
                 <X className="h-4 w-4" />
               </button>
             ) : null}
-            {suggestions.length > 0 ? (
-              <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-lg">
-                {suggestions.map((s) => (
-                  <li key={s.id}>
+            {listOpen ? (
+              <ul
+                id={`${comboId}-listbox`}
+                role="listbox"
+                className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-lg"
+              >
+                {suggestions.map((s, i) => (
+                  <li
+                    key={s.id}
+                    id={`${comboId}-opt-${i}`}
+                    role="option"
+                    aria-selected={i === active}
+                  >
                     <button
                       type="button"
-                      onClick={() => setSearch(s.name)}
-                      className="block w-full px-4 py-2.5 text-left text-sm text-popover-foreground hover:bg-accent"
+                      onClick={() => applySuggestion(s.name)}
+                      // Highlight uses the existing accent token, so the keyboard
+                      // highlight looks exactly like today's hover state (3.18).
+                      className={`block w-full px-4 py-2.5 text-left text-sm text-popover-foreground hover:bg-accent ${
+                        i === active ? "bg-accent" : ""
+                      }`}
                     >
                       {s.name}
                       <span className="ml-2 text-xs text-muted-foreground">{s.category}</span>

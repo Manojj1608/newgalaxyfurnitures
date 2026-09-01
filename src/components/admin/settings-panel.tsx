@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -9,7 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { logAudit, saveSettings } from "@/lib/content-api";
 import { useSettings } from "@/hooks/use-content";
+import { useImageUpload } from "@/hooks/use-image-upload";
+import { validateUploadFile } from "@/lib/uploads";
 import { QueryFailed } from "@/components/site/query-state";
+import { BrandMark } from "@/components/site/brand-mark";
 
 import type { SiteSettings } from "@/lib/content-types";
 
@@ -22,7 +25,10 @@ const TEXT_FIELDS: [keyof SiteSettings, string][] = [
   ["address", "Address"],
   ["showroom_hours", "Showroom hours"],
   ["maps_embed_url", "Google Maps embed URL"],
-  ["logo_url", "Logo URL"],
+  // 1.4: `logo_url` used to live here as a plain free-text input, which is why no
+  // upload, preview, replace or remove affordance could exist. It is now a real
+  // managed-asset control rendered above this grid. Every other field keeps its
+  // position, copy and save path (3.13).
   ["instagram_url", "Instagram"],
   ["facebook_url", "Facebook"],
   ["youtube_url", "YouTube"],
@@ -45,6 +51,10 @@ export function SettingsPanel() {
   const { data: settings, isLoading, isError, refetch } = useSettings();
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
   const [saving, setSaving] = useState(false);
+  // 2.4: the merged shared pipeline is the ONLY upload path used here.
+  const { uploading, uploadOne, summarise } = useImageUpload();
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const uid = useId();
 
   if (isError)
     return <QueryFailed message="Could not load site settings." onRetry={() => void refetch()} />;
@@ -53,10 +63,33 @@ export function SettingsPanel() {
   if (!settings) return <p className="text-sm text-muted-foreground">No settings row found.</p>;
 
   const value = (key: keyof SiteSettings) =>
-    draft?.[key as string] ?? ((settings[key] as string | null) ?? "");
+    draft?.[key as string] ?? (settings[key] as string | null) ?? "";
 
   function set(key: keyof SiteSettings, v: string) {
     setDraft((d) => ({ ...(d ?? {}), [key as string]: v }));
+  }
+
+  /**
+   * 2.4: upload → preview → Save. Validation runs before anything is attempted,
+   * and a rejected or failed upload leaves `draft` untouched so the previously
+   * saved logo keeps rendering on the storefront.
+   */
+  async function pickLogo(files: FileList | null) {
+    const file = files?.[0];
+    // Allow re-selecting the same file after a failure.
+    if (logoInputRef.current) logoInputRef.current.value = "";
+    if (!file) return;
+
+    const result = validateUploadFile(file);
+    if (!result.ok) return toast.error(result.message);
+
+    try {
+      const image = await uploadOne(file);
+      set("logo_url", image.url);
+      toast.success(summarise({ succeeded: [image], failed: [] }));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Logo upload failed");
+    }
   }
 
   async function submit(e: React.FormEvent) {
@@ -93,11 +126,59 @@ export function SettingsPanel() {
         </Button>
       </div>
 
+      {/* 2.4: the managed-asset logo control. Built only from Button, Input and
+          Label — already used in this file — so no new design vocabulary enters
+          the codebase (3.18). */}
+      <div className="space-y-2">
+        <Label htmlFor={`${uid}-logo`}>Logo</Label>
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Previewed through the same BrandMark the storefront uses, against the
+              pending draft value, so admin and storefront cannot disagree. */}
+          <BrandMark
+            settings={{ ...settings, logo_url: value("logo_url") } as SiteSettings}
+            size="header"
+          />
+          <Input
+            id={`${uid}-logo`}
+            ref={logoInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => void pickLogo(e.target.files)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={uploading}
+            onClick={() => logoInputRef.current?.click()}
+          >
+            {uploading ? "Uploading…" : value("logo_url") ? "Replace logo" : "Upload logo"}
+          </Button>
+          {value("logo_url") ? (
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={uploading}
+              onClick={() => set("logo_url", "")}
+            >
+              Remove
+            </Button>
+          ) : null}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          PNG, JPG or WebP. Applied when you save; the brand monogram is used while no logo is set.
+        </p>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         {TEXT_FIELDS.map(([key, label]) => (
           <div key={key as string} className="space-y-2">
-            <Label>{label}</Label>
-            <Input value={value(key)} onChange={(e) => set(key, e.target.value)} />
+            <Label htmlFor={`${uid}-${key}`}>{label}</Label>
+            <Input
+              id={`${uid}-${key}`}
+              value={value(key)}
+              onChange={(e) => set(key, e.target.value)}
+            />
           </div>
         ))}
       </div>
@@ -105,8 +186,13 @@ export function SettingsPanel() {
       <div className="grid gap-4">
         {LONG_FIELDS.map(([key, label]) => (
           <div key={key as string} className="space-y-2">
-            <Label>{label}</Label>
-            <Textarea rows={3} value={value(key)} onChange={(e) => set(key, e.target.value)} />
+            <Label htmlFor={`${uid}-${key}`}>{label}</Label>
+            <Textarea
+              id={`${uid}-${key}`}
+              rows={3}
+              value={value(key)}
+              onChange={(e) => set(key, e.target.value)}
+            />
           </div>
         ))}
       </div>

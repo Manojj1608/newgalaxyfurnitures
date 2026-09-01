@@ -5,7 +5,8 @@ import { Clock, Mail, MapPin, MessageCircle, Phone, Quote } from "lucide-react";
 import { Catalogue } from "@/components/site/catalogue";
 import { HeroSlider } from "@/components/site/hero-slider";
 import { ProductCard } from "@/components/site/product-card";
-import { NGMonogram, SiteHeader } from "@/components/site/site-header";
+import { SiteHeader } from "@/components/site/site-header";
+import { BrandMark } from "@/components/site/brand-mark";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { QueryFailed } from "@/components/site/query-state";
@@ -257,7 +258,7 @@ function AboutSection({
     <section id="about" className="section-shell">
       <div className="page-shell grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <NGMonogram className="h-20 w-20" />
+          <BrandMark settings={settings} size="about" />
           <h2 className="section-title mt-6">{section.title ?? "About us"}</h2>
         </div>
         <p className="text-base leading-9 text-muted-foreground">{body}</p>
@@ -392,7 +393,7 @@ function Footer({
     <footer className="border-t border-border bg-secondary/50">
       <div className="page-shell grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <NGMonogram className="h-12 w-12" />
+          <BrandMark settings={settings} size="footer" />
           <p className="mt-4 font-display text-2xl text-foreground">
             {settings?.company_name ?? "New Galaxy Furniture"}
           </p>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Mail, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
@@ -109,7 +109,9 @@ export function EnquiriesPanel() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">{e.customer_name || "Anonymous"}</span>
+                    <span className="font-medium text-foreground">
+                      {e.customer_name || "Anonymous"}
+                    </span>
                     <Badge variant={e.status === "new" ? "default" : "secondary"}>{e.status}</Badge>
                     <Badge variant="secondary">{e.channel}</Badge>
                   </div>
@@ -117,7 +119,9 @@ export function EnquiriesPanel() {
                     {new Date(e.created_at).toLocaleString()}
                     {e.product_name ? ` · ${e.product_name}` : ""}
                   </p>
-                  {e.message && <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{e.message}</p>}
+                  {e.message && (
+                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{e.message}</p>
+                  )}
                   <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
                     {e.phone && (
                       <a href={`tel:${e.phone}`} className="inline-flex items-center gap-1">
@@ -186,6 +190,9 @@ export function EnquiriesPanel() {
 }
 
 function NotesForm({ row, onSaved }: { row: EnquiryRow; onSaved: () => void }) {
+  // 2.17: one id namespace per mounted instance, so a dialog closed and reopened
+  // (or two rows rendered together) can never produce a duplicate id.
+  const uid = useId();
   const [notes, setNotes] = useState(row.notes ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -212,8 +219,13 @@ function NotesForm({ row, onSaved }: { row: EnquiryRow; onSaved: () => void }) {
         </div>
       )}
       <div className="space-y-2">
-        <Label>Internal notes</Label>
-        <Textarea rows={5} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <Label htmlFor={`${uid}-internal-notes`}>Internal notes</Label>
+        <Textarea
+          id={`${uid}-internal-notes`}
+          rows={5}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
       </div>
       <DialogFooter>
         <Button type="submit" variant="luxury" disabled={saving}>
