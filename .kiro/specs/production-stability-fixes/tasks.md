@@ -404,11 +404,11 @@ form; tasks within a wave may run in parallel, waves run in order):
   - _Design_Property: 11_
   - _Env: SANDBOX-PARTIAL (live row sets and rendering: NOT-VERIFIABLE-HERE)_
 
-- [ ] 4. Phase 1 — CRITICAL fixes (independently shippable, before anything else is touched)
+- [x] 4. Phase 1 — CRITICAL fixes (independently shippable, before anything else is touched)
 
   These three items share no code with the long tail and ship on their own, in this order.
 
-  - [ ] 4.1 Create the `product-images` storage bucket (new append-only migration)
+  - [x] 4.1 Create the `product-images` storage bucket (new append-only migration)
     - New file `supabase/migrations/<ts>_create_product_images_bucket.sql`. Do NOT edit any of the 18 existing
       migrations (3.13)
     - All 18 existing migrations contain zero `storage.buckets` writes, yet four RLS policies are keyed on
@@ -438,7 +438,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _**NOT VERIFIED**: bucket existence, its current `public` flag, its current limits, and whether the four storage policies are actually applied on the live project are all unreadable with an anon key. This migration's effect on production MUST be reported as NOT VERIFIED until run against the live project or a branch/shadow database_
     - _Env: NOT-VERIFIABLE-HERE_
 
-  - [ ] 4.2 Align storage write policies to the staff model (new append-only migration)
+  - [x] 4.2 Align storage write policies to the staff model (new append-only migration)
     - New file `supabase/migrations/<ts>_align_storage_policies_to_staff_model.sql`
     - Replace `private.has_role(auth.uid(), 'admin')` in the three storage write policies from
       `20260627095713`: INSERT → `private.is_staff(auth.uid())`, UPDATE → `private.is_staff(auth.uid())`,
@@ -460,7 +460,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _**NOT VERIFIED**: live policy state_
     - _Env: NOT-VERIFIABLE-HERE_
 
-  - [ ] 4.3 Route guard denies non-staff before the admin route and its queries load
+  - [x] 4.3 Route guard denies non-staff before the admin route and its queries load
     - New `src/lib/admin-guard.ts` holds ALL logic so it is unit-testable without a router. Export:
       `type Access = {status:'anonymous'} | {status:'error';message} | {status:'denied';user} |
       {status:'ready';user;roles;isAdmin;isManager;isStaff}`, plus pure `deriveAccess(user, roles, lookupError)`

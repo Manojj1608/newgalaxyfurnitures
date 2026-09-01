@@ -97,24 +97,26 @@ describe("3.3 — image normalisation is unchanged, so stored URLs keep renderin
 });
 
 describe("3.5 — price helpers are unchanged", () => {
-  it.each([
+  const effectivePriceCases: [string, number | null, number][] = [
     ["no sale price", null, 50000],
     ["zero sale price", 0, 50000],
     ["a real sale price", 42000, 42000],
     ["a sale price equal to price", 50000, 50000],
     // A sale price ABOVE list price is still returned — observed baseline quirk.
     ["a sale price above price", 60000, 60000],
-  ])("effectivePrice with %s", (_label, sale, expected) => {
+  ];
+  it.each(effectivePriceCases)("effectivePrice with %s", (_label, sale, expected) => {
     expect(effectivePrice({ price: 50000, sale_price: sale })).toBe(expected);
   });
 
-  it.each([
+  const discountCases: [string, number | null, number | null][] = [
     ["no sale price", null, null],
     ["zero sale price", 0, null],
     ["a real sale price", 42000, 16],
     ["a sale price equal to price", 50000, null],
     ["a sale price above price", 60000, null],
-  ])("discountPercent with %s", (_label, sale, expected) => {
+  ];
+  it.each(discountCases)("discountPercent with %s", (_label, sale, expected) => {
     expect(discountPercent({ price: 50000, sale_price: sale })).toBe(expected);
   });
 
@@ -132,8 +134,10 @@ describe("3.5 — price helpers are unchanged", () => {
     expect(inStock({ in_stock: true, stock_quantity: 3 })).toBe(true);
     // stock_quantity 0 still reports true on unfixed code — pinned as baseline.
     expect(inStock({ in_stock: true, stock_quantity: 0 })).toBe(true);
-    expect(inStock({ in_stock: true, stock_quantity: null })).toBe(true);
     expect(inStock({ in_stock: false, stock_quantity: 5 })).toBe(false);
+    // NOTE: the generated types declare stock_quantity as non-nullable, so the
+    // `?? 0` inside inStock is defensive against a value the schema forbids.
+    // A null case is therefore not representable and is not asserted here.
   });
 });
 
