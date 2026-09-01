@@ -708,7 +708,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit test that a failing write restores the prior cache value; manually revoke UPDATE, click a switch, confirm the error and the reverted position_
     - _Env: SANDBOX-PARTIAL_
 
-- [ ] 8. Phase 5 — loading / empty / error, separated everywhere
+- [x] 8. Phase 5 — loading / empty / error, separated everywhere
 
   - [x] 8.1 Add one pure state selector and one presentational error card
     - New `src/components/site/query-state.tsx` exporting
@@ -737,7 +737,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: component test asserting the media panel renders the error card and NOT "No media yet." when the query fails_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 8.3 Homepage keeps rendering the sections that did load
+  - [x] 8.3 Homepage keeps rendering the sections that did load
     - The hooks already return `isError`/`refetch`; `index.tsx` stops discarding them (the `= []`/`= null`
       destructuring defaults are the direct cause)
     - Sections whose data failed render `<QueryFailed onRetry={refetch} />` in place of their content while
@@ -750,7 +750,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: with the network offline, assert an error state with a working retry for the failed section and that other sections still render_
     - _Env: SANDBOX-PARTIAL_
 
-  - [ ] 8.4 Product page: real 404s and metadata from the real record
+  - [x] 8.4 Product page: real 404s and metadata from the real record
     - Split the single `if (!product)` branch in three: `isLoading` → the existing skeleton; `isError` → a
       load-failure card with Retry (`refetch`); `data === null` → the existing "Piece not found" markup, copy,
       route and CTA UNCHANGED. Only a genuinely absent or unpublished product now yields the 404 page (1.27)
@@ -830,7 +830,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: unit tests per task 11.1, plus the property that `classifyLink` NEVER returns `'internal'` for a value that is not a registered route — the invariant preventing the crash_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 10.2 Category selection never silently no-ops
+  - [x] 10.2 Category selection never silently no-ops
     - `index.tsx` derives whether a `catalogue` section is enabled. When it IS, behaviour is unchanged (set
       state, scroll to the ref). When it is NOT, the click gives explicit feedback via the existing `sonner`
       toast instead of scrolling to an unmounted ref
@@ -840,7 +840,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Verification: assert feedback is produced when no catalogue section is enabled, and that the unchanged path still sets state and scrolls_
     - _Env: SANDBOX-PARTIAL_
 
-  - [ ] 10.3 Clipboard confirms only on real success
+  - [x] 10.3 Clipboard confirms only on real success
     - One `copyToClipboard(text): Promise<boolean>` helper. The media panel AWAITS it and toasts "URL copied"
       only on `true`; on `false` it shows the URL for manual copying
     - `share()` on the product page wraps its `navigator.clipboard` call so there is no unhandled rejection and
@@ -939,7 +939,7 @@ form; tasks within a wave may run in parallel, waves run in order):
 
 - [ ] 11. Write the unit and property tests over real exported logic
 
-  - [ ] 11.1 Unit tests whose subjects are real exported functions in `src/`
+  - [x] 11.1 Unit tests whose subjects are real exported functions in `src/`
     - **PROHIBITED — this is a hard rule.** No test may configure a mock and then assert that the mock returned
       its configured value; that asserts the test's own setup and proves nothing. Injected fakes are permitted
       ONLY as boundaries (Supabase storage, the network, the clipboard) and NEVER as the subject. Every
@@ -968,7 +968,7 @@ form; tasks within a wave may run in parallel, waves run in order):
     - _Design_Property: 10_
     - _Env: SANDBOX-COMPLETE_
 
-  - [ ] 11.2 Property-based tests over the real input domains
+  - [x] 11.2 Property-based tests over the real input domains
     - Arbitrary file sets (mixed MIME types, sizes, adversarial filenames) → `succeeded.length +
       failed.length === files.length`, every rejection carries a reason, no valid file skipped because a
       sibling failed

@@ -7,6 +7,8 @@ import { HeroSlider } from "@/components/site/hero-slider";
 import { ProductCard } from "@/components/site/product-card";
 import { NGMonogram, SiteHeader } from "@/components/site/site-header";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { QueryFailed } from "@/components/site/query-state";
 import {
   useBanners,
   useCategories,
@@ -18,6 +20,9 @@ import {
 import type { CategoryRow, HomepageSection, Product, SiteSettings } from "@/lib/content-types";
 import { PLACEHOLDER_IMAGE } from "@/lib/content-types";
 import { whatsappHref } from "@/lib/whatsapp";
+
+/** Stable empty-array identity for query fallbacks (see HomePage). */
+const EMPTY: never[] = [];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -464,19 +469,39 @@ function Footer({
 
 function HomePage() {
   useContentRealtime();
-  const { data: products = [] } = useProducts();
-  const { data: categories = [] } = useCategories();
-  const { data: sections = [] } = useSections();
-  const { data: banners = [] } = useBanners();
-  const { data: settings = null } = useSettings();
+  // 1.24: the `= []` / `= null` destructuring defaults made a FAILED query
+  // structurally identical to an empty one, so an offline or RLS-denied load
+  // rendered as a near-blank homepage with no error state and no retry.
+  const productsQ = useProducts();
+  const categoriesQ = useCategories();
+  const sectionsQ = useSections();
+  const bannersQ = useBanners();
+  const settingsQ = useSettings();
+
+  // EMPTY is hoisted to module scope so the `?? EMPTY` fallback has a STABLE
+  // identity across renders; an inline `?? []` would allocate a new array each
+  // render and destabilise the `buckets` useMemo below.
+  const products = productsQ.data ?? EMPTY;
+  const categories = categoriesQ.data ?? EMPTY;
+  const sections = sectionsQ.data ?? EMPTY;
+  const banners = bannersQ.data ?? EMPTY;
+  const settings = settingsQ.data ?? null;
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const catalogueRef = useRef<HTMLDivElement>(null);
 
   const whatsapp = settings?.whatsapp ?? "919513443606";
 
+  const catalogueEnabled = sections.some((s) => s.section_type === "catalogue");
+
   const selectCategory = (id: string) => {
     setSelectedCategory(id);
+    // 1.30: when no catalogue section is enabled the ref is not mounted, so the
+    // old scrollIntoView was a silent no-op. Give explicit feedback instead.
+    if (!catalogueEnabled) {
+      toast.info("The catalogue section is currently disabled on the homepage.");
+      return;
+    }
     requestAnimationFrame(() =>
       catalogueRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
     );
@@ -492,11 +517,51 @@ function HomePage() {
     [products],
   );
 
+  // Which query each section type depends on, so a failure is reported on the
+  // section that actually needs the data.
+  const SECTION_DEPENDENCIES: Record<
+    string,
+    { query: { isError: boolean; refetch: () => unknown }; message: string }[]
+  > = {
+    hero: [{ query: bannersQ, message: "Could not load the hero banners." }],
+    categories: [{ query: categoriesQ, message: "Could not load the collections." }],
+    featured: [{ query: productsQ, message: "Could not load products." }],
+    new_arrivals: [{ query: productsQ, message: "Could not load products." }],
+    bestsellers: [{ query: productsQ, message: "Could not load products." }],
+    trending: [{ query: productsQ, message: "Could not load products." }],
+    catalogue: [
+      { query: productsQ, message: "Could not load products." },
+      { query: categoriesQ, message: "Could not load the collections." },
+    ],
+  };
+
   return (
     <main className="min-h-screen">
       <SiteHeader settings={settings} categories={categories} onSelectCategory={selectCategory} />
 
+      {/* 1.24: if the section list itself failed, show one error card with a
+          retry rather than a blank page. */}
+      {sectionsQ.isError ? (
+        <div className="page-shell py-16">
+          <QueryFailed
+            message="Could not load the homepage layout."
+            onRetry={() => void sectionsQ.refetch()}
+          />
+        </div>
+      ) : null}
+
       {sections.map((section) => {
+        // 1.24: a section whose own data failed renders an error card with a
+        // retry IN PLACE of its content, while every section that did load keeps
+        // rendering — a single failure never blanks the page.
+        const failed = SECTION_DEPENDENCIES[section.section_type]?.find((dep) => dep.query.isError);
+        if (failed) {
+          return (
+            <div key={section.id} className="page-shell py-16">
+              <QueryFailed message={failed.message} onRetry={() => void failed.query.refetch()} />
+            </div>
+          );
+        }
         switch (section.section_type) {
           case "hero":
             return <HeroSlider key={section.id} banners={banners} />;
